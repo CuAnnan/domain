@@ -1,3 +1,4 @@
+#!/usr/bin/node
 /***
  * This is just a series of functions to add and remove things from a SQLite Database rather than an object's attributes
  * The sphere, name, and room values all refer explicitly to object ids from the MUSH
