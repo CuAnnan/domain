@@ -12,7 +12,10 @@ const functions = {
     'claimDomain':claimDomain,
     'addRoomToDomain':addRoomToDomain,
     'addPlayersToDomain':addPlayersToDomain,
-    'setDomainDetails':setDomainDetails
+    'setDomainDetails':setDomainDetails,
+    'test':()=>{
+        return 'success';
+    }
 };
 
 /**
