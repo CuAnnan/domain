@@ -4,8 +4,16 @@
 &CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
 &CMD.DOMAIN.REVOKE zobj=$+domain/revoke *:@include me/fnc.domain.revoke=%0
 &CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
-&fnc.domain.revoke zobj=$[setq(user,%#)];[setq(res, [execscript(domain/index.js, revokeDomain, objid(%#)|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
-&FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript(domain/index.js, claimDomain, objid(%#)|[objid(parent(%#))]|%0|objid(%l))])];@sudo %l=@pemit [r(user)]=[r(res)]
+
+&fnc.domain.revoke zobj=[setq(user,%#)];[setq(res, [execscript(domain/index.js, revokeDomain, [objid(%#)]|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript(domain/index.js, claimDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+
+&cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript(domain/index.js, getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#])];[setq(res, [execscript(domain/index.js, addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+
+&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript(domain/index.js, removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+
+&var.security zobj = 6
 @rxlevel zobj=
 @txlevel zobj=
 @set zobj=ZONEPARENT ZONECONTENTS ZONEMASTER INHERIT SIDEFX

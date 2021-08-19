@@ -2,6 +2,9 @@
 /***
  * This is just a series of functions to add and remove things from a SQLite Database rather than an object's attributes
  * The sphere, name, and room values all refer explicitly to object ids from the MUSH
+ *
+ * I haven't, as of 2021-08-19, rewritten all of the exposed function syntax.
+ * The syntax for all functions is execscript(build/indexjs command args|separated|by|pipes)
  */
 
 
@@ -11,9 +14,11 @@ const db = new Database(__dirname+'/domain.db');
 const functions = {
     'claimDomain':claimDomain,
     'addRoomToDomain':addRoomToDomain,
+    'removeRoomFromDomain':removeRoomFromDomain,
     'addPlayersToDomain':addPlayersToDomain,
     'setDomainDetails':setDomainDetails,
     'revokeDomain':revokeDomain,
+    'getDomainNamesByPlayer':getDomainNamesByPlayer,
     'test':function(){
         process.stdout.write('Success');
     }
@@ -21,12 +26,11 @@ const functions = {
 
 /**
  * This is an exposed function. The command line format for it is
- * node index.js claimDomain [player object id] [sphere object id] [Name of Domain] [room object id]
+ * execscript(domain/index.js, claimDomain <player object id>|<sphere object id>|<Name of Domain>|<room object id>)
  * @param player
  * @param sphere
  * @param name
  * @param room
- * @returns {number} 1 on success, otherwise throws an exception
  */
 function claimDomain(player, sphere, name, room) {
     db.exec('BEGIN TRANSACTION');
@@ -49,7 +53,7 @@ function claimDomain(player, sphere, name, room) {
             throw (e);
         }
         try {
-            executeAddPlayersToDomainQuery(idDomain, player);
+            executeAddPlayersToDomainQuery(idDomain, [player]);
         }catch(e){
             process.stdout.write(`Could not execute query to add player to domain, rolling back. Please alert your system administrator.`);
             throw (e);
@@ -63,6 +67,12 @@ function claimDomain(player, sphere, name, room) {
 
 }
 
+/***
+ * Removes the domain from the db
+ * execscript(domain/index/js revokeDomain <player>|<domain>
+ * @param player
+ * @param domain
+ */
 function revokeDomain(player, domain)
 {
     try {
@@ -75,6 +85,19 @@ function revokeDomain(player, domain)
     }
 }
 
+function getDomainNamesByPlayer(domainName)
+{
+    let stmt = db.prepare("SELECT name FROM domains WHERE owner = ?");
+    let qry = stmt.all(domainName);
+    let results = [];
+    for(let res of qry)
+    {
+        results.push(res.name);
+    }
+    let domainsOwned = results.join('|');
+    process.stdout.write(domainsOwned);
+}
+
 /**
  * Helper function to get the id of a domain
  * @param player
@@ -83,9 +106,9 @@ function revokeDomain(player, domain)
  */
 function getIdDomainsByPlayerAndName(player, name)
 {
-    let stmt = db.prepare('SELECT idDomains FROM domains WHERE owner = ? AND name = ?');
+    let stmt = db.prepare('SELECT idDomains, name FROM domains WHERE owner = ? AND name = ?');
     let qry = stmt.get(player, name);
-    return qry.idDomains;
+    return qry;
 }
 
 /**
@@ -98,15 +121,49 @@ function getIdDomainsByPlayerAndName(player, name)
  */
 function addRoomToDomain(player, sphere, name, room)
 {
-    let idDomains = getIdDomainsByPlayerAndName(player, name);
-    executeAddRoomToDomainQuery(idDomains)
+    let res = getIdDomainsByPlayerAndName(player, name);
+    let idDomains = res.idDomains;
+    let domainName = res.name;
+    try {
+        executeAddRoomToDomainQuery(idDomains, sphere, room);
+        process.stdout.write(`You have added this room to your domain ${domainName}`)
+    }catch(e)
+    {
+        if(e.message.startsWith('UNIQUE constraint'))
+        {
+            process.stdout.write('This room is already a part of a domain for this sphere');
+        }
+        else
+        {
+            process.stdout.write(`There was an error adding this room to your domain ${domainName}`);
+        }
+    }
 }
 
 function executeAddRoomToDomainQuery(idDomain, sphere, room)
 {
     let stmt = db.prepare('INSERT INTO rooms (idDomains, sphere, room) VALUES (?, ?, ?)');
     let query =stmt.run(idDomain, sphere, room);
-    return 1;
+}
+
+function removeRoomFromDomain(player, sphere, name, room)
+{
+    let res = getIdDomainsByPlayerAndName(player, name);
+    let idDomains = res.idDomains;
+    let domainName = res.name;
+    try {
+        executeRemoveRoomFromDomainQuery(idDomains, sphere, room);
+        process.stdout.write(`You have removed this room from your domain ${domainName}`)
+    }catch(e)
+    {
+        process.stdout.write(`There was an error removing your room from the domain. ${e.message}`);
+    }
+}
+
+function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
+{
+    let stmt = db.prepare('DELETE FROM rooms WHERE idDomains = ? AND sphere = ? AND ROOM = ?');
+    stmt.run(idDomain, sphere, room);
 }
 
 /***
