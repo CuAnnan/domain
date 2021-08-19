@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#! /usr/bin/node
 /***
  * This is just a series of functions to add and remove things from a SQLite Database rather than an object's attributes
  * The sphere, name, and room values all refer explicitly to object ids from the MUSH
@@ -6,15 +6,15 @@
 
 
 const Database = require("better-sqlite3");
-const db = new Database('domain.db');
+const db = new Database(__dirname+'/domain.db');
 
 const functions = {
     'claimDomain':claimDomain,
     'addRoomToDomain':addRoomToDomain,
     'addPlayersToDomain':addPlayersToDomain,
     'setDomainDetails':setDomainDetails,
-    'test':()=>{
-        return 'success';
+    'test':function(){
+        process.stdout.write('Success');
     }
 };
 
@@ -27,14 +27,48 @@ const functions = {
  * @param room
  * @returns {number} 1 on success, otherwise throws an exception
  */
-function claimDomain(player, sphere, name, room)
+function claimDomain(player, sphere, name, room) {
+    db.exec('BEGIN TRANSACTION');
+    try
+    {
+        let idDomain;
+        try {
+            let stmt = db.prepare('INSERT INTO domains (name, sphere, owner) VALUES (?, ?, ?)');
+            let query = stmt.run(name, sphere, player);
+            idDomain = query.lastInsertRowid;
+        }catch(e){
+            process.stdout.write(`0 You already have a domain named ${name} "${e.message}"`);
+            throw (e);
+        }
+        try {
+            executeAddRoomToDomainQuery(idDomain, sphere, room);
+        }catch(e){
+            process.stdout.write(`0 This room is already part of a domain for your sphere`);
+        }
+        try {
+            executeAddPlayersToDomainQuery(idDomain, player);
+        }catch(e){
+            process.stdout.write(`-1 Could not execute query to add player to domain`);
+        }
+        db.exec('COMMIT');
+        process.stdout.write(`1 You have created a domain called ${name}`);
+    }catch(e)
+    {
+        db.exec('ROLLBACK');
+    }
+
+}
+
+function revokeDomain(player, domain)
 {
-    let stmt = db.prepare('INSERT INTO domains (name, sphere, owner) VALUES (?, ?, ?)');
-    let query = stmt.run(name, sphere, player);
-    let idDomain = query.lastInsertRowid;
-    executeAddRoomToDomainQuery(idDomain, sphere, room);
-    executeAddPlayersToDomainQuery(idDomain, player);
-    return 1;
+    try {
+        let stmt = db.prepare("DELETE FROM domains WHERE player = ? AND name = ?");
+        stmt.run(player, domain);
+        process.stdout.write(`1 You have revoked your claim to the domain ${name}`);
+    }catch(e)
+    {
+        process.stdout.write(`0 ${e.message}`);
+    }
 }
 
 /**
@@ -134,23 +168,30 @@ function parseCommand(command, args)
     if(functionKeys.indexOf(command) >=0)
     {
         func = functions[command];
-        db.exec('BEGIN TRANSACTION');
-        try {
-            console.log(func(...args));
-            db.exec('COMMIT');
+        if(args) {
+            func(...args);
         }
-        catch(e)
+        else
         {
-            console.log('#-1', e.message);
-            db.exec('ROLLBACK');
+            func();
         }
     }
     else
     {
-        console.log('#-1 Unknown command');
+        process.stdout.write(`#-1 Unknown command ${command}`);
     }
 }
 
-let command = process.argv.slice(2,3)[0], args = process.argv.slice(3);
+let command, args, argvparts=process.argv.slice(2,3)[0].split(' ');
+if(argvparts.length > 1)
+{
+    let argparts;
+    [command, argparts]=argvparts;
+    args=argparts.split('|');
+}
+else
+{
+    command = argvparts[0];
+}
 
 parseCommand(command, args);
