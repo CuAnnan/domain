@@ -13,6 +13,8 @@
 
 &cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript(domain/index.js, removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
+&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(res, [execscript(domain/index.js, addMembersToDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+
 &var.security zobj = 6
 @rxlevel zobj=
 @txlevel zobj=

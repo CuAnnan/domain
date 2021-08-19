@@ -15,7 +15,7 @@ const functions = {
     'claimDomain':claimDomain,
     'addRoomToDomain':addRoomToDomain,
     'removeRoomFromDomain':removeRoomFromDomain,
-    'addPlayersToDomain':addPlayersToDomain,
+    'addMembersToDomain':addMembersToDomain,
     'setDomainDetails':setDomainDetails,
     'revokeDomain':revokeDomain,
     'getDomainNamesByPlayer':getDomainNamesByPlayer,
@@ -53,7 +53,7 @@ function claimDomain(player, sphere, name, room) {
             throw (e);
         }
         try {
-            executeAddPlayersToDomainQuery(idDomain, [player]);
+            executeAddMembersToDomainQuery(idDomain, [player]);
         }catch(e){
             process.stdout.write(`Could not execute query to add player to domain, rolling back. Please alert your system administrator.`);
             throw (e);
@@ -172,17 +172,26 @@ function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
  * @param owner
  * @param name
  */
-function addPlayersToDomain(owner, name) {
-    let players = Array.from(arguments).slice(2);
-    let idDomains = getIdDomainsByPlayerAndName(owner, name);
-    executeAddPlayersToDomainQuery(idDomains, players);
+function addMembersToDomain(owner, name) {
+    let args = Array.from(arguments);
+    let players = args.slice(2);
+    let res = getIdDomainsByPlayerAndName(owner, name);
+    let idDomains = res.idDomains;
+    try {
+        executeAddMembersToDomainQuery(idDomains, players);
+        process.stdout.write('Added');
+    }catch(e){
+        process.stdout.write('There was a problem addeding player(s) to domain');
+    }
 }
 
-function executeAddPlayersToDomainQuery(idDomain, players)
+function executeAddMembersToDomainQuery(idDomain, players)
 {
+
     let stmt = db.prepare('INSERT INTO members (idDomains, member) VALUES (?, ?)');
     for(let player of players)
     {
+        console.log(player);
         let query = stmt.run(idDomain, player);
     }
     return 1;
