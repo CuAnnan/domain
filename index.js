@@ -13,6 +13,7 @@ const functions = {
     'addRoomToDomain':addRoomToDomain,
     'addPlayersToDomain':addPlayersToDomain,
     'setDomainDetails':setDomainDetails,
+    'revokeDomain':revokeDomain,
     'test':function(){
         process.stdout.write('Success');
     }
