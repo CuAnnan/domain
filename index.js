@@ -33,26 +33,29 @@ function claimDomain(player, sphere, name, room) {
     try
     {
         let idDomain;
+        let error='';
         try {
             let stmt = db.prepare('INSERT INTO domains (name, sphere, owner) VALUES (?, ?, ?)');
             let query = stmt.run(name, sphere, player);
             idDomain = query.lastInsertRowid;
         }catch(e){
-            process.stdout.write(`0 You already have a domain named ${name} "${e.message}"`);
+            process.stdout.write(`You already have a domain named ${name}`);
             throw (e);
         }
         try {
             executeAddRoomToDomainQuery(idDomain, sphere, room);
         }catch(e){
-            process.stdout.write(`0 This room is already part of a domain for your sphere`);
+            process.stdout.write(`This room is already part of a domain for your sphere`);
+            throw (e);
         }
         try {
             executeAddPlayersToDomainQuery(idDomain, player);
         }catch(e){
-            process.stdout.write(`-1 Could not execute query to add player to domain`);
+            process.stdout.write(`Could not execute query to add player to domain, rolling back. Please alert your system administrator.`);
+            throw (e);
         }
         db.exec('COMMIT');
-        process.stdout.write(`1 You have created a domain called ${name}`);
+        process.stdout.write(`You have claimed a domain and called it ${name}`);
     }catch(e)
     {
         db.exec('ROLLBACK');
@@ -63,12 +66,12 @@ function claimDomain(player, sphere, name, room) {
 function revokeDomain(player, domain)
 {
     try {
-        let stmt = db.prepare("DELETE FROM domains WHERE player = ? AND name = ?");
+        let stmt = db.prepare("DELETE FROM domains WHERE owner = ? AND name = ?");
         stmt.run(player, domain);
-        process.stdout.write(`1 You have revoked your claim to the domain ${name}`);
+        process.stdout.write(`You have revoked your claim to the domain ${domain}`);
     }catch(e)
     {
-        process.stdout.write(`0 ${e.message}`);
+        process.stdout.write(`There was an error revoking your claim to the domain ${player} ${e.message}`);
     }
 }
 
@@ -166,15 +169,17 @@ function parseCommand(command, args)
 {
     let func;
     let functionKeys = Object.keys(functions);
-    if(functionKeys.indexOf(command) >=0)
-    {
+    if(functionKeys.indexOf(command) >=0) {
         func = functions[command];
-        if(args) {
-            func(...args);
-        }
-        else
-        {
-            func();
+        try {
+            if (args) {
+                func(...args);
+
+            } else {
+                func();
+            }
+        } catch (e){
+            console.log(e);
         }
     }
     else
@@ -182,7 +187,6 @@ function parseCommand(command, args)
         process.stdout.write(`#-1 Unknown command ${command}`);
     }
 }
-
 let command, args, argvparts=process.argv.slice(2,3)[0].split(' ');
 if(argvparts.length > 1)
 {

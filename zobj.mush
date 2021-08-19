@@ -1,9 +1,13 @@
 @create zobj=10
 @Desc zobj=Testing the Domain stuff
 &CMD.DOMAIN.CLAIM zobj=$+Domain/claim *:@include me/fnc.domain.claim=%0
-&CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setr(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
-&FNC.DOMAIN.CLAIM zobj=[setr(user, %#)];[setr(res, [execscript(domain/index.js, claimDomain, objid(%#)|[objid(parent(%#))]|%0|objid(%l))])];@sudo %l=@pemit [r(user)]=[r(res)]
+&CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
+&CMD.DOMAIN.REVOKE zobj=$+domain/revoke *:@include me/fnc.domain.revoke=%0
+&CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
+&fnc.domain.revoke zobj=$[setq(user,%#)];[setq(res, [execscript(domain/index.js, revokeDomain, objid(%#)|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript(domain/index.js, claimDomain, objid(%#)|[objid(parent(%#))]|%0|objid(%l))])];@sudo %l=@pemit [r(user)]=[r(res)]
 @rxlevel zobj=
 @txlevel zobj=
 @set zobj=ZONEPARENT ZONECONTENTS ZONEMASTER INHERIT SIDEFX
+
 @power/councilor zobj=EXECSCRIPT
