@@ -5,8 +5,12 @@
  *
  * I haven't, as of 2021-08-19, rewritten all of the exposed function syntax.
  * The syntax for all functions is execscript(build/indexjs command args|separated|by|pipes)
+ *
+ * Thanks to Ambrosia and Polk from the RhostMUSH discord server for their continued support and guidance in working
+ * with execscript is warranted and given.
  */
 
+// TODO: move away from command line arguments and towards using registers which are exposed to process as environment variables
 
 const Database = require("better-sqlite3");
 const db = new Database(__dirname+'/domain.db');
@@ -19,10 +23,52 @@ const functions = {
     'setDomainDetails':setDomainDetails,
     'revokeDomain':revokeDomain,
     'getDomainNamesByPlayer':getDomainNamesByPlayer,
+    'removeMembersFromDomain':removeMembersFromDomain,
+    'fetchDomainDetails':fetchDomainDetails,
     'test':function(){
-        process.stdout.write('Success');
+
+        for(let key in process.env)
+        {
+            if(key.startsWith('MUSHQN_')) {
+                console.log(key);
+            }
+        }
     }
 };
+
+/**
+ * The code for this function came from https://github.com/RhostMUSH/deno-rhost/blob/master/rhost.js, courtesy of Polk
+ * @param string
+ */
+function* convertStringTo128Bit(string)
+{
+    for(let char of string[Symbol.iterator]())
+    {
+        let cp = char.codePointAt(0);
+        let out;
+        if(cp > 127)
+        {
+            cp = cp.toString(0x10).padStart(4,'0');
+            out =`%<u${cp}>`;
+        }
+        else
+        {
+            out = String.fromCodePoint(cp);
+        }
+        yield out;
+    }
+}
+
+function respond(string)
+{
+    let response = '';
+    for(let char of convertStringTo128Bit(string))
+    {
+        response += char;
+    }
+
+    process.stdout.write(response);
+}
 
 /**
  * This is an exposed function. The command line format for it is
@@ -43,23 +89,23 @@ function claimDomain(player, sphere, name, room) {
             let query = stmt.run(name, sphere, player);
             idDomain = query.lastInsertRowid;
         }catch(e){
-            process.stdout.write(`You already have a domain named ${name}`);
+            respond(`You already have a domain named ${name}`);
             throw (e);
         }
         try {
             executeAddRoomToDomainQuery(idDomain, sphere, room);
         }catch(e){
-            process.stdout.write(`This room is already part of a domain for your sphere`);
+            respond(`This room is already part of a domain for your sphere`);
             throw (e);
         }
         try {
             executeAddMembersToDomainQuery(idDomain, [player]);
         }catch(e){
-            process.stdout.write(`Could not execute query to add player to domain, rolling back. Please alert your system administrator.`);
+            respond(`Could not execute query to add player to domain, rolling back. Please alert your system administrator.`);
             throw (e);
         }
         db.exec('COMMIT');
-        process.stdout.write(`You have claimed a domain and called it ${name}`);
+        respond(`You have claimed a domain and called it ${name}`);
     }catch(e)
     {
         db.exec('ROLLBACK');
@@ -78,10 +124,10 @@ function revokeDomain(player, domain)
     try {
         let stmt = db.prepare("DELETE FROM domains WHERE owner = ? AND name = ?");
         stmt.run(player, domain);
-        process.stdout.write(`You have revoked your claim to the domain ${domain}`);
+        respond(`You have revoked your claim to the domain ${domain}`);
     }catch(e)
     {
-        process.stdout.write(`There was an error revoking your claim to the domain ${player} ${e.message}`);
+        respond(`There was an error revoking your claim to the domain ${player} ${e.message}`);
     }
 }
 
@@ -95,7 +141,7 @@ function getDomainNamesByPlayer(domainName)
         results.push(res.name);
     }
     let domainsOwned = results.join('|');
-    process.stdout.write(domainsOwned);
+    respond(domainsOwned);
 }
 
 /**
@@ -126,16 +172,16 @@ function addRoomToDomain(player, sphere, name, room)
     let domainName = res.name;
     try {
         executeAddRoomToDomainQuery(idDomains, sphere, room);
-        process.stdout.write(`You have added this room to your domain ${domainName}`)
+        respond(`You have added this room to your domain ${domainName}`)
     }catch(e)
     {
         if(e.message.startsWith('UNIQUE constraint'))
         {
-            process.stdout.write('This room is already a part of a domain for this sphere');
+            respond('This room is already a part of a domain for this sphere');
         }
         else
         {
-            process.stdout.write(`There was an error adding this room to your domain ${domainName}`);
+            respond(`There was an error adding this room to your domain ${domainName}`);
         }
     }
 }
@@ -153,10 +199,10 @@ function removeRoomFromDomain(player, sphere, name, room)
     let domainName = res.name;
     try {
         executeRemoveRoomFromDomainQuery(idDomains, sphere, room);
-        process.stdout.write(`You have removed this room from your domain ${domainName}`)
+        respond(`You have removed this room from your domain ${domainName}`)
     }catch(e)
     {
-        process.stdout.write(`There was an error removing your room from the domain. ${e.message}`);
+        respond(`There was an error removing your room from the domain. ${e.message}`);
     }
 }
 
@@ -168,7 +214,7 @@ function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
 
 /***
  * This is an exposed function. The command line format for it is
- * node index.js addPlayersToDomain [player object id] [Name of Domain] [space separated list of player object ids, which are extracted from the arguments object]
+ * exescript (domain/index.js, addPlayersToDomain, [player object id]|[Name of Domain]|[space separated list of player object ids, which are extracted from the arguments object])
  * @param owner
  * @param name
  */
@@ -179,22 +225,57 @@ function addMembersToDomain(owner, name) {
     let idDomains = res.idDomains;
     try {
         executeAddMembersToDomainQuery(idDomains, players);
-        process.stdout.write('Added');
+        respond('Added');
     }catch(e){
-        process.stdout.write('There was a problem addeding player(s) to domain');
+        respond('There was a problem adding player(s) to domain');
     }
 }
 
+/**
+ * @param idDomain  The pkid of domain
+ * @param players   An array of player object ids
+ */
 function executeAddMembersToDomainQuery(idDomain, players)
 {
-
-    let stmt = db.prepare('INSERT INTO members (idDomains, member) VALUES (?, ?)');
+   let stmt = db.prepare('INSERT INTO members (idDomains, member) VALUES (?, ?)');
     for(let player of players)
     {
-        console.log(player);
         let query = stmt.run(idDomain, player);
     }
-    return 1;
+}
+
+/***
+ * This is an exposed function. The command line format for it is
+ * exescript (domain/index.js, removeMembersFromDomain, [player object id]|[Name of Domain]|[space separated list of player object ids, which are extracted from the arguments object])
+ * @param owner
+ * @param name
+ */
+function removeMembersFromDomain(owner, name)
+{
+    let args = Array.from(arguments);
+    let players = args.slice(2);
+    let res = getIdDomainsByPlayerAndName(owner, name);
+    let idDomains = res.idDomains;
+    try
+    {
+        executeRemoveMembersFromDomainQuery(idDomains, players);
+        respond('Removed players from the domain');
+    }catch(e){
+        respond(`There was a problem removing the player(s) from the domain ${e.message}`);
+    }
+}
+
+/**
+ * @param idDomain  The pkid of domain
+ * @param players   An array of player object ids
+ */
+function executeRemoveMembersFromDomainQuery(idDomain, players)
+{
+    let stmt = db.prepare('DELETE FROM members WHERE idDomains = ? AND member = ?');
+    for(let player of players)
+    {
+        let query = stmt.run(idDomain, player);
+    }
 }
 
 /**
@@ -230,6 +311,44 @@ function setDomainDetails(player, name)
     return 1;
 }
 
+function fetchDomainDetails(player, domainName)
+{
+    try {
+        let domainStmt = db.prepare(
+            'SELECT ' +
+            'd.name AS name, d.idDomains AS idDomains, d.owner AS owner ' +
+            'FROM ' +
+            'domains d LEFT JOIN members m USING(idDomains) ' +
+            'WHERE ' +
+            'm.member = ? AND d.name = ?'
+        );
+        let domainQry = domainStmt.get(player, domainName);
+        let {idDomains, owner} = domainQry;
+        let details = `Domain Name~${domainName}|Owner~${owner}`;
+
+        let membersStmt = db.prepare('SELECT member FROM members WHERE idDomains = ?');
+        let membersQry = membersStmt.all(idDomains);
+        let members = [];
+        for(let memberRow of membersQry)
+        {
+            members.push(memberRow.member);
+        }
+        details += `|Members~${members.join('*')}`;
+
+        let roomsStmt = db.prepare('SELECT room FROM rooms WHERE idDomains = ?');
+        let roomsQry = roomsStmt.all(idDomains);
+        let rooms = [];
+        for(let roomRow of roomsQry)
+        {
+            rooms.push(roomRow.room);
+        }
+        details += `|Rooms~${rooms.join('*')}`;
+
+        respond(details);
+    }catch(e){
+        console.log(e);
+    }
+}
 
 function parseCommand(command, args)
 {
@@ -240,7 +359,6 @@ function parseCommand(command, args)
         try {
             if (args) {
                 func(...args);
-
             } else {
                 func();
             }
@@ -250,7 +368,7 @@ function parseCommand(command, args)
     }
     else
     {
-        process.stdout.write(`#-1 Unknown command ${command}`);
+        respond(`#-1 Unknown command ${command}`);
     }
 }
 let command, args, argvparts=process.argv.slice(2,3)[0].split(' ');

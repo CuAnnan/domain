@@ -1,19 +1,22 @@
 @create zobj=10
 @Desc zobj=Testing the Domain stuff
+&con.domain.path zobj =domain/index.js
 &CMD.DOMAIN.CLAIM zobj=$+Domain/claim *:@include me/fnc.domain.claim=%0
 &CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
 &CMD.DOMAIN.REVOKE zobj=$+domain/revoke *:@include me/fnc.domain.revoke=%0
 &CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
+&fnc.domain.revoke zobj=[setq(user,%#)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)]|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], claimDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#])];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)]|[%0])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
+&inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail, ##)],[u(inc.domain.format.name, ##)])],|,%r)]
+&inc.domain.format.name zobj=[center([index(%0,~,1,1)]: [index(%0,~,2,1)],80,=)]
+&inc.domain.format.detail zobj = [index(%0,~,1,1)]: [parse(index(%0,~,2,1),name(##),*,%,%b)]
 
-&fnc.domain.revoke zobj=[setq(user,%#)];[setq(res, [execscript(domain/index.js, revokeDomain, [objid(%#)]|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
-&FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript(domain/index.js, claimDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-
-&cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript(domain/index.js, getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#])];[setq(res, [execscript(domain/index.js, addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-
-&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript(domain/index.js, removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-
-&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(res, [execscript(domain/index.js, addMembersToDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
 &var.security zobj = 6
 @rxlevel zobj=
