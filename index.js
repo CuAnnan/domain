@@ -311,6 +311,13 @@ function setDomainDetails(player, name)
     return 1;
 }
 
+/**
+ * This function finds the domain named <domainName> that the <player> is a member of and returns the detaisl
+ * The details are returned as a single string not ready for display and so the zone object will need to format
+ * accordingly.
+ * @param player
+ * @param domainName
+ */
 function fetchDomainDetails(player, domainName)
 {
     try {
