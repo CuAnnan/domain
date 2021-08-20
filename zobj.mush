@@ -19,6 +19,8 @@
 &inc.domain.format.detail.printf zobj=[printf($.1:|:&s$-14s$&65s,%r,[capstr(%0)],wrap(%1,63,l,|,|))]
 &cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%0]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
+
+
 &var.security zobj = 6
 @rxlevel zobj=
 @txlevel zobj=
