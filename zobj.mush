@@ -8,15 +8,16 @@
 &fnc.domain.revoke zobj=[setq(user,%#)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)]|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
 &FNC.DOMAIN.CLAIM zobj=[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], claimDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#])];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)]|[%0])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
-&inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail, ##)],[u(inc.domain.format.name, ##)])],|,%r)]
-&inc.domain.format.name zobj=[center([index(%0,~,1,1)]: [index(%0,~,2,1)],80,=)]
-&inc.domain.format.detail zobj = [index(%0,~,1,1)]: [parse(index(%0,~,2,1),name(##),*,%,%b)]
-
+&inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail.nice, ##)],[u(inc.domain.format.name, ##)])],|,%r)]%r[repeat(-,80)]
+&inc.domain.format.name zobj=[center([index(%0,~,1,1)]: [index(%0,~,2,1)],80,-)]
+&inc.domain.format.detail.nice zobj = [setq(key, [index(%0,~,1,1)])][setq(value,index(%0,~,2,1))][setq(formattedValue,[ifelse(isnum([r(value)]),[r(value)],parse([r(value)],name(##),*,%,%b))])][u(inc.domain.format.detail.printf,r(key),r(formattedValue))]
+&inc.domain.format.detail.printf zobj=[printf($.1:|:&s$-14s$&65s,%r,[capstr(%0)],wrap(%1,63,l,|,|))]
+&cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%0]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
 &var.security zobj = 6
 @rxlevel zobj=

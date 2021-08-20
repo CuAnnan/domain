@@ -20,7 +20,7 @@ const functions = {
     'addRoomToDomain':addRoomToDomain,
     'removeRoomFromDomain':removeRoomFromDomain,
     'addMembersToDomain':addMembersToDomain,
-    'setDomainDetails':setDomainDetails,
+    'setDomainDetail':setDomainDetail,
     'revokeDomain':revokeDomain,
     'getDomainNamesByPlayer':getDomainNamesByPlayer,
     'removeMembersFromDomain':removeMembersFromDomain,
@@ -280,35 +280,26 @@ function executeRemoveMembersFromDomainQuery(idDomain, players)
 
 /**
  * This is an exposed function. The command line format for it is
- * node index.js setDomainDetails [player object id] [Name of Domain] [space separated list of pairs of key value settings, which are extracted from the arguments object]
+ * node index.js setDomainDetails [player object id] [Name of Domain] [key] [value]
  * @param player
  * @param name
  */
-function setDomainDetails(player, name)
+function setDomainDetail(player, name, key, value)
 {
-    let idDomains = getIdDomainsByPlayerAndName(player, name);
-    let pairs = Array.from(arguments).slice(2);
-    if(pairs.length %2)
-    {
-        throw new Error('Invalid number of domain detail key/value pairs provided');
-    }
-    let keyValues = {};
-    while(pairs.length)
-    {
-        keyValues[pairs.shift()] = pairs.shift();
-    }
-
-    let stmt = db.prepare(
-        'INSERT INTO details ' +
+    let idDomains = getIdDomainsByPlayerAndName(player, name).idDomains;
+    key = key.toLowerCase();
+    try {
+        let stmt = db.prepare(
+            'INSERT INTO details ' +
             '(idDomains, key, value) ' +
             'VALUES (?, ?, ?)' +
             'ON CONFLICT(key, idDomains) DO UPDATE SET value = excluded.value'
-    );
-    for(let [key,value] of Object.entries(keyValues))
-    {
+        );
         stmt.run(idDomains, key, value);
+        respond(`Set ${key} to ${value} on domain ${name}`);
+    }catch(e){
+        respond(e.message);
     }
-    return 1;
 }
 
 /**
@@ -331,30 +322,33 @@ function fetchDomainDetails(player, domainName)
         );
         let domainQry = domainStmt.get(player, domainName);
         let {idDomains, owner} = domainQry;
-        let details = `Domain Name~${domainName}|Owner~${owner}`;
-
-        let membersStmt = db.prepare('SELECT member FROM members WHERE idDomains = ?');
-        let membersQry = membersStmt.all(idDomains);
-        let members = [];
-        for(let memberRow of membersQry)
+        let response = `Domain Name~${domainName}|Owner~${owner}`;
+        let members=getDomainRecords('member', idDomains);
+        response += `|Members~${members.join('*')}`;
+        let rooms = getDomainRecords('room', idDomains);
+        response += `|Rooms~${rooms.join('*')}`;
+        let detailsStmt = db.prepare('SELECT key, value FROM details WHERE idDomains = ?');
+        let detailsQry = detailsStmt.all(idDomains);
+        for(let detail of detailsQry)
         {
-            members.push(memberRow.member);
+            response += `|${detail.key}~${detail.value}`;
         }
-        details += `|Members~${members.join('*')}`;
-
-        let roomsStmt = db.prepare('SELECT room FROM rooms WHERE idDomains = ?');
-        let roomsQry = roomsStmt.all(idDomains);
-        let rooms = [];
-        for(let roomRow of roomsQry)
-        {
-            rooms.push(roomRow.room);
-        }
-        details += `|Rooms~${rooms.join('*')}`;
-
-        respond(details);
+        respond(response);
     }catch(e){
         console.log(e);
     }
+}
+
+function getDomainRecords(recordType, idDomains)
+{
+    let recordStmt = db.prepare(`SELECT ${recordType} FROM ${recordType}s WHERE idDomains = ?`);
+    let recordQry = recordStmt.all(idDomains);
+    let records = [];
+    for(let record of recordQry)
+    {
+        records.push(record[recordType]);
+    }
+    return records;
 }
 
 function parseCommand(command, args)
