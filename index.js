@@ -25,14 +25,18 @@ const functions = {
     'getDomainNamesByPlayer':getDomainNamesByPlayer,
     'removeMembersFromDomain':removeMembersFromDomain,
     'fetchDomainDetails':fetchDomainDetails,
-    'test':function(){
-
-        for(let key in process.env)
-        {
-            if(key.startsWith('MUSHQN_')) {
-                console.log(key);
-            }
-        }
+    'setFeedingMethod':setFeedingMethod,
+    'getFeedingMethod':getFeedingMethod,
+    'setFeedingPool':setFeedingPool,
+    'test':async function(){
+        let p = new Promise((resolve, reject)=>{
+            setTimeout(()=>{
+                resolve();
+            },2000);
+        });
+        p.then(()=>{
+            respond('This is how promises work');
+        });
     }
 };
 
@@ -351,6 +355,34 @@ function getDomainRecords(recordType, idDomains)
     return records;
 }
 
+function setFeedingMethod(player, method)
+{
+    let feedingStmt = db.prepare('INSERT INTO feeding (player, method) VALUES (?,?) ON CONFLICT DO UPDATE SET method = excluded.method');
+    feedingStmt.run(player, method);
+    respond(`Set feeding method to ${method}`);
+}
+
+function getFeedingMethod(player)
+{
+    let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
+    let qry = feedingStmt.get(player);
+    respond(qry.method);
+}
+
+function setFeedingPool(player, pool)
+{
+    let feedingStmt = db.prepare('INSERT INTO feeding (player, pool) VALUES (?,?) ON CONFLICT DO UPDATE SET pool = excluded.pool');
+    feedingStmt.run(player, pool);
+    respond(`Set feeding pool to ${pool}`);
+}
+
+function getFeedingPool(player)
+{
+    let feedingStmt = db.prepare('SELECT pool FROM feeding WHERE player = ?');
+    let qry = feedingStmt.get(player);
+    respond(qry.pool);
+}
+
 function parseCommand(command, args)
 {
     let func;
@@ -373,6 +405,21 @@ function parseCommand(command, args)
     }
 }
 let command, args, argvparts=process.argv.slice(2,3)[0].split(' ');
+
+let registers=[];
+
+Object.keys(process.env).filter(key=> key.match(/^MUSHQ_/)).forEach(function(key){
+    let reg = key.replace('MUSHQ_', '');
+    let name = process.env[`MUSHQN_${reg}`];
+    let value = process.env[key];
+    registers.push({
+        register:reg,
+        name:name,
+        value:value
+    });
+});
+console.log(registers);
+
 if(argvparts.length > 1)
 {
     let argparts;
