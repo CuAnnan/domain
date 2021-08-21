@@ -76,13 +76,14 @@ function respond(string)
 
 /**
  * This is an exposed function. The command line format for it is
- * execscript(domain/index.js, claimDomain <player object id>|<sphere object id>|<Name of Domain>|<room object id>)
+ * execscript(domain/index.js, claimDomain <player object id>|<sphere object id>|<room object id>)
+ * The name of the domain is stored as a register
  * @param player
  * @param sphere
- * @param name
  * @param room
  */
-function claimDomain(player, sphere, name, room) {
+function claimDomain(player, sphere, room) {
+    let name = registers.N.value;
     db.exec('BEGIN TRANSACTION');
     try
     {
@@ -369,11 +370,14 @@ function getFeedingMethod(player)
     respond(qry.method);
 }
 
-function setFeedingPool(player, pool)
+/**
+ * @param player
+ */
+function setFeedingPool(player)
 {
     let feedingStmt = db.prepare('INSERT INTO feeding (player, pool) VALUES (?,?) ON CONFLICT DO UPDATE SET pool = excluded.pool');
-    feedingStmt.run(player, pool);
-    respond(`Set feeding pool to ${pool}`);
+    feedingStmt.run(player, registers['P'].value);
+    respond(`Set feeding pool to ${registers['P'].value}`);
 }
 
 function getFeedingPool(player)
@@ -406,19 +410,18 @@ function parseCommand(command, args)
 }
 let command, args, argvparts=process.argv.slice(2,3)[0].split(' ');
 
-let registers=[];
+let registers={};
 
 Object.keys(process.env).filter(key=> key.match(/^MUSHQ_/)).forEach(function(key){
     let reg = key.replace('MUSHQ_', '');
     let name = process.env[`MUSHQN_${reg}`];
     let value = process.env[key];
-    registers.push({
+    registers[reg]={
         register:reg,
         name:name,
         value:value
-    });
+    };
 });
-console.log(registers);
 
 if(argvparts.length > 1)
 {
