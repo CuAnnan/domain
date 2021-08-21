@@ -29,6 +29,8 @@ const functions = {
     'getFeedingMethod':getFeedingMethod,
     'setFeedingPool':setFeedingPool,
     'getFeedingPool':getFeedingPool,
+    'getDomainSecurity':getDomainSecurity,
+    'checkDomainMembership':checkDomainMembership,
     'test':async function(){
         let p = new Promise((resolve, reject)=>{
             setTimeout(()=>{
@@ -123,10 +125,10 @@ function claimDomain(player, sphere, room) {
  * Removes the domain from the db
  * execscript(domain/index/js revokeDomain <player>|<domain>
  * @param player
- * @param domain
  */
-function revokeDomain(player, domain)
+function revokeDomain(player)
 {
+    let domain = registers.D.value;
     try {
         let stmt = db.prepare("DELETE FROM domains WHERE owner = ? AND name = ?");
         stmt.run(player, domain);
@@ -171,8 +173,9 @@ function getIdDomainsByPlayerAndName(player, name)
  * @param name
  * @param room
  */
-function addRoomToDomain(player, sphere, name, room)
+function addRoomToDomain(player, sphere, room)
 {
+    let name = registers.D.value;
     let res = getIdDomainsByPlayerAndName(player, name);
     let idDomains = res.idDomains;
     let domainName = res.name;
@@ -198,8 +201,9 @@ function executeAddRoomToDomainQuery(idDomain, sphere, room)
     let query =stmt.run(idDomain, sphere, room);
 }
 
-function removeRoomFromDomain(player, sphere, name, room)
+function removeRoomFromDomain(player, sphere, room)
 {
+    let name = registers.D.value;
     let res = getIdDomainsByPlayerAndName(player, name);
     let idDomains = res.idDomains;
     let domainName = res.name;
@@ -224,7 +228,8 @@ function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
  * @param owner
  * @param name
  */
-function addMembersToDomain(owner, name) {
+function addMembersToDomain(owner) {
+    let name = registers.D.value;
     let args = Array.from(arguments);
     let players = args.slice(2);
     let res = getIdDomainsByPlayerAndName(owner, name);
@@ -256,8 +261,9 @@ function executeAddMembersToDomainQuery(idDomain, players)
  * @param owner
  * @param name
  */
-function removeMembersFromDomain(owner, name)
+function removeMembersFromDomain(owner)
 {
+    let name = registers.D.value;
     let args = Array.from(arguments);
     let players = args.slice(2);
     let res = getIdDomainsByPlayerAndName(owner, name);
@@ -269,6 +275,22 @@ function removeMembersFromDomain(owner, name)
     }catch(e){
         respond(`There was a problem removing the player(s) from the domain ${e.message}`);
     }
+}
+
+function checkDomainMembership(member, sphere, room)
+{
+    let stmt = db.prepare(
+        'SELECT ' +
+                'd.idDomains ' +
+            'FROM ' +
+                'domains d ' +
+                    'LEFT JOIN rooms r USING (idDomains) ' +
+                    'LEFT JOIN members m ON (m.idDomains = d.idDomains) ' +
+            'WHERE ' +
+                'r.room = ? AND m.member = ? AND d.sphere = ?'
+    );
+    let row = stmt.get(room, member, sphere);
+    respond(""+(row?1:0));
 }
 
 /**
@@ -290,8 +312,9 @@ function executeRemoveMembersFromDomainQuery(idDomain, players)
  * @param player
  * @param name
  */
-function setDomainDetail(player, name, key, value)
+function setDomainDetail(player, key, value)
 {
+    let name = registers.D.value;
     let idDomains = getIdDomainsByPlayerAndName(player, name).idDomains;
     key = key.toLowerCase();
     try {
@@ -308,6 +331,36 @@ function setDomainDetail(player, name, key, value)
     }
 }
 
+function getDomainSecurity(room)
+{
+    let sphere = registers.S.value;
+
+    let stmt = db.prepare(
+        'SELECT ' +
+                'd.value, d.key ' +
+            'FROM ' +
+                'domains dom ' +
+                    'LEFT JOIN details d USING (idDomains) ' +
+                    'LEFT JOIN rooms r ON (d.idDomains = r.idDomains) ' +
+            'WHERE ' +
+                'r.room = ? and dom.sphere = ?'
+    );
+    let rows = stmt.all(room, sphere);
+    let response = [];
+    let details = {security:0, rating:0};
+    for(let row of rows)
+    {
+        details[row.key] = row.value;
+    }
+
+    for(const [key, value] of Object.entries(details))
+    {
+        response.push(`${key}:${value}`);
+    }
+
+    respond(response.join('|'));
+}
+
 /**
  * This function finds the domain named <domainName> that the <player> is a member of and returns the detaisl
  * The details are returned as a single string not ready for display and so the zone object will need to format
@@ -315,8 +368,9 @@ function setDomainDetail(player, name, key, value)
  * @param player
  * @param domainName
  */
-function fetchDomainDetails(player, domainName)
+function fetchDomainDetails(player)
 {
+    let domainName = registers.D.value;
     try {
         let domainStmt = db.prepare(
             'SELECT ' +

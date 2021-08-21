@@ -6,23 +6,32 @@
 &CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
 &CMD.DOMAIN.REVOKE zobj=$+domain/revoke *:@include me/fnc.domain.revoke=%0
 &CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
-&fnc.domain.revoke zobj=[setq(user,%#)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)]|%0)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&fnc.domain.revoke zobj=[setq(user,%#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|%0|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[%0]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)]|[%0])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
+&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
 &inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail.nice, ##)],[u(inc.domain.format.name, ##)])],|,%r)]%r[repeat(-,80)]
 &inc.domain.format.name zobj=[center([index(%0,~,1,1)]: [index(%0,~,2,1)],80,-)]
 &inc.domain.format.detail.nice zobj = [setq(key, [index(%0,~,1,1)])][setq(value,index(%0,~,2,1))][setq(formattedValue,[ifelse(isnum([r(value)]),[r(value)],parse([r(value)],name(##),*,%,%b))])][u(inc.domain.format.detail.printf,r(key),r(formattedValue))]
 &inc.domain.format.detail.printf zobj=[printf($.1:|:&s$-14s$&65s,%r,[capstr(%0)],wrap(%1,63,l,|,|))]
-&cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%0]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(domain, %0)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
 &cmd.feeding.setMethod zobj=$+feed/method *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.feeding.getMethod zobj=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod, [objid(%#)])])];@sudo %l=@pemit [r(user)]=Your feeding method is listed as [r(res)]
 &cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [u(inc.feeding.getPool)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&inc.feeding.getPool zojb=[execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])]
+
+&cmd.feeding.feed zobj=$+feed/here:@include me/inc.domain.getFeedingDetails;@sudo %l=@pemit [r(user)]=+roll [r(pool)] vs [r(diff)]
+
+&inc.domain.getFeedingDetails zobj=[setq(user, %#)];[setq(pool, execscript([u(con.domain.path)], getFeedingPool, [objid(%#)]))];[setq(sphere, objid(parent(%#)))];@dolist/inline/delimit | [execscript([u(con.domain.path)], getDomainSecurity, [objid(%l)])]=@include me/inc.feed.parseFeedingDetails = ##;@include me/inc.domain.playerIsMember;@include me/inc.feed.calculateDifficulty;[pushregs(1)];@sudo %l=@pemit [r(user)]=[r(pool)]
+&inc.feed.parseFeedingDetails zobj=[setq([index(%0,:,1,1)],[index(%0,:,2,1)])];
+&inc.feed.calculateDifficulty zobj=[setq(diff, ifelse(r(member),max(3, diff(u(var.security), r(rating))),add(u(var.security), r(security))))];
+
+&inc.domain.playerIsMember zobj=[setq(member,execscript([u(con.domain.path)],checkDomainMembership,[objid(%#)]|[objid(parent(%#))]|[objid(%l)]))];
 
 &var.security zobj = 6
 @rxlevel zobj=
