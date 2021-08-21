@@ -5,6 +5,7 @@
  *
  * I haven't, as of 2021-08-19, rewritten all of the exposed function syntax.
  * The syntax for all functions is execscript(build/indexjs command args|separated|by|pipes)
+ * Any argument that might conceivably have a space in it is passed via the registers not the arguments.
  *
  * Thanks to Ambrosia and Polk from the RhostMUSH discord server for their continued support and guidance in working
  * with execscript is warranted and given.
@@ -28,6 +29,7 @@ const functions = {
     'setFeedingMethod':setFeedingMethod,
     'getFeedingMethod':getFeedingMethod,
     'setFeedingPool':setFeedingPool,
+    'getFeedingPool':getFeedingPool,
     'test':async function(){
         let p = new Promise((resolve, reject)=>{
             setTimeout(()=>{

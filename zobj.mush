@@ -21,8 +21,8 @@
 
 &cmd.feeding.setMethod zobj=$+feed/method *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.feeding.getMethod zobj=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod, [objid(%#)])])];@sudo %l=@pemit [r(user)]=Your feeding method is listed as [r(res)]
-&cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[pushregs(1)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
-
+&cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
 &var.security zobj = 6
 @rxlevel zobj=
