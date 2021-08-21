@@ -11,7 +11,6 @@
  * with execscript is warranted and given.
  */
 
-// TODO: move away from command line arguments and towards using registers which are exposed to process as environment variables
 
 const Database = require("better-sqlite3");
 const db = new Database(__dirname+'/domain.db');
