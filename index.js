@@ -276,7 +276,6 @@ function addMembersToDomain(owner) {
 function executeAddMembersToDomainQuery(idDomain, players)
 {
    let stmt = db.prepare('INSERT OR IGNORE INTO members (idDomains, member) VALUES (?, ?)');
-   console.log(idDomain, players);
     for(let player of players)
     {
         console.log(idDomain, player);
