@@ -31,6 +31,8 @@ const functions = {
     'getFeedingPool':getFeedingPool,
     'getDomainSecurity':getDomainSecurity,
     'checkDomainMembership':checkDomainMembership,
+    'transferDomain':transferDomain,
+    'leaveDomain':leaveDomain,
     'test':async function(){
         let p = new Promise((resolve, reject)=>{
             setTimeout(()=>{
@@ -121,6 +123,23 @@ function claimDomain(player, sphere, room) {
 
 }
 
+function transferDomain(oldOwner, newOwner)
+{
+    let name = registers.D.value;
+    try
+    {
+        let idDomains = getIdDomainsByPlayerAndName(oldOwner, name);
+        let stmt = db.prepare('UPDATE domains SET owner = ? where name = ? AND owner = ?');
+        stmt.run(newOwner, name, oldOwner);
+        executeAddMembersToDomainQuery(idDomains, [newOwner]);
+        respond(`Ownership of domain ${name} transferred.`);
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
 /***
  * Removes the domain from the db
  * execscript(domain/index/js revokeDomain <player>|<domain>
@@ -139,17 +158,25 @@ function revokeDomain(player)
     }
 }
 
-function getDomainNamesByPlayer(domainName)
+function getDomainNamesByPlayer(member)
 {
-    let stmt = db.prepare("SELECT name FROM domains WHERE owner = ?");
-    let qry = stmt.all(domainName);
+    let stmt = db.prepare(
+        "SELECT " +
+            "d.name AS name " +
+        "FROM " +
+            "domains d " +
+            "LEFT JOIN members m USING (idDomains) " +
+        "WHERE " +
+            "m.member = ?"
+    );
+    let qry = stmt.all(member);
     let results = [];
     for(let res of qry)
     {
         results.push(res.name);
     }
-    let domainsOwned = results.join('|');
-    respond(domainsOwned);
+    let domains = results.join('|');
+    respond(domains);
 }
 
 /**
@@ -231,7 +258,7 @@ function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
 function addMembersToDomain(owner) {
     let name = registers.D.value;
     let args = Array.from(arguments);
-    let players = args.slice(2);
+    let players = args.slice(1);
     let res = getIdDomainsByPlayerAndName(owner, name);
     let idDomains = res.idDomains;
     try {
@@ -248,9 +275,11 @@ function addMembersToDomain(owner) {
  */
 function executeAddMembersToDomainQuery(idDomain, players)
 {
-   let stmt = db.prepare('INSERT INTO members (idDomains, member) VALUES (?, ?)');
+   let stmt = db.prepare('INSERT OR IGNORE INTO members (idDomains, member) VALUES (?, ?)');
+   console.log(idDomain, players);
     for(let player of players)
     {
+        console.log(idDomain, player);
         let query = stmt.run(idDomain, player);
     }
 }
@@ -274,6 +303,28 @@ function removeMembersFromDomain(owner)
         respond('Removed players from the domain');
     }catch(e){
         respond(`There was a problem removing the player(s) from the domain ${e.message}`);
+    }
+}
+
+function leaveDomain(user)
+{
+    try {
+        let name = registers.D.value;
+        let domainStmt = db.prepare(
+            'SELECT ' +
+                    'd.idDomains AS idDomains ' +
+                'FROM ' +
+                    'domains d ' +
+                    'LEFT JOIN members m USING (idDomains) ' +
+                'WHERE ' +
+                    'm.member = ? AND d.name = ?'
+        );
+        console.log(user, name);
+        let idDomains = domainStmt.get(user, name).idDomains;
+        executeRemoveMembersFromDomainQuery(idDomains, [user]);
+        respond(`You have left the domain ${name}`);
+    }catch(e){
+        console.log(e);
     }
 }
 

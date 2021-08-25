@@ -10,7 +10,7 @@
 &cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[objid(*%1)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[parse(%1,[objid(##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
 &inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail.nice, ##)],[u(inc.domain.format.name, ##)])],|,%r)]%r[repeat(-,80)]
@@ -18,12 +18,14 @@
 &inc.domain.format.detail.nice zobj = [setq(key, [index(%0,~,1,1)])][setq(value,index(%0,~,2,1))][setq(formattedValue,[ifelse(isnum([r(value)]),[r(value)],parse([r(value)],name(##),*,%,%b))])][u(inc.domain.format.detail.printf,r(key),r(formattedValue))]
 &inc.domain.format.detail.printf zobj=[printf($.1:|:&s$-14s$&65s,%r,[capstr(%0)],wrap(%1,63,l,|,|))]
 &cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(domain, %0)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.transfer zobj=$+domain/transfer *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript(u(con.domain.path), transferDomain, [objid(%#)]|[objid(*%1)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.leave zobj=$+domain/leave *:=[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], leaveDomain, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 
 &cmd.feeding.setMethod zobj=$+feed/method *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.feeding.getMethod zobj=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod, [objid(%#)])])];@sudo %l=@pemit [r(user)]=Your feeding method is listed as [r(res)]
 &cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [u(inc.feeding.getPool)])];@sudo %l=@pemit [r(user)]=[r(res)]
-&inc.feeding.getPool zojb=[execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])]
+&inc.feeding.getPool zobj=[execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])]
 
 &cmd.feeding.feed zobj=$+feed/here:@include me/inc.domain.getFeedingDetails;@sudo %l=@pemit [r(user)]=+roll [r(pool)] vs [r(diff)]
 
