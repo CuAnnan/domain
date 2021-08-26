@@ -33,6 +33,7 @@ const functions = {
     'checkDomainMembership':checkDomainMembership,
     'transferDomain':transferDomain,
     'leaveDomain':leaveDomain,
+    'adminListDomains':adminListDomains,
     'test':async function(){
         let p = new Promise((resolve, reject)=>{
             setTimeout(()=>{
@@ -77,6 +78,18 @@ function respond(string)
     }
 
     process.stdout.write(response);
+}
+
+function adminListDomains()
+{
+    let stmt = db.prepare('SELECT idDomains, name, sphere, owner FROM domains');
+    let qry = stmt.all();
+    let results = [];
+    for(let row of qry)
+    {
+        results.push(`${row.idDomains}~${row.name}~${row.sphere}~${row.owner}`);
+    }
+    respond(results.join('|'));
 }
 
 /**
@@ -278,8 +291,7 @@ function executeAddMembersToDomainQuery(idDomain, players)
    let stmt = db.prepare('INSERT OR IGNORE INTO members (idDomains, member) VALUES (?, ?)');
     for(let player of players)
     {
-        console.log(idDomain, player);
-        let query = stmt.run(idDomain, player);
+        stmt.run(idDomain, player);
     }
 }
 
