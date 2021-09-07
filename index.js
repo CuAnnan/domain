@@ -34,6 +34,10 @@ const functions = {
     'transferDomain':transferDomain,
     'leaveDomain':leaveDomain,
     'adminListDomains':adminListDomains,
+    'testregisters':function()
+    {
+        console.log(registers);
+    },
     'test':async function(){
         let p = new Promise((resolve, reject)=>{
             setTimeout(()=>{
@@ -138,7 +142,7 @@ function claimDomain(player, sphere, room) {
 
 function transferDomain(oldOwner, newOwner)
 {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     try
     {
         let idDomains = getIdDomainsByPlayerAndName(oldOwner, name);
@@ -160,7 +164,7 @@ function transferDomain(oldOwner, newOwner)
  */
 function revokeDomain(player)
 {
-    let domain = registers.D.value;
+    let domain = registers.domain.value;;
     try {
         let stmt = db.prepare("DELETE FROM domains WHERE owner = ? AND name = ?");
         stmt.run(player, domain);
@@ -215,7 +219,7 @@ function getIdDomainsByPlayerAndName(player, name)
  */
 function addRoomToDomain(player, sphere, room)
 {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     let res = getIdDomainsByPlayerAndName(player, name);
     let idDomains = res.idDomains;
     let domainName = res.name;
@@ -243,7 +247,7 @@ function executeAddRoomToDomainQuery(idDomain, sphere, room)
 
 function removeRoomFromDomain(player, sphere, room)
 {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     let res = getIdDomainsByPlayerAndName(player, name);
     let idDomains = res.idDomains;
     let domainName = res.name;
@@ -269,7 +273,7 @@ function executeRemoveRoomFromDomainQuery(idDomain, sphere, room)
  * @param name
  */
 function addMembersToDomain(owner) {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     let args = Array.from(arguments);
     let players = args.slice(1);
     let res = getIdDomainsByPlayerAndName(owner, name);
@@ -303,7 +307,7 @@ function executeAddMembersToDomainQuery(idDomain, players)
  */
 function removeMembersFromDomain(owner)
 {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     let args = Array.from(arguments);
     let players = args.slice(2);
     let res = getIdDomainsByPlayerAndName(owner, name);
@@ -320,7 +324,7 @@ function removeMembersFromDomain(owner)
 function leaveDomain(user)
 {
     try {
-        let name = registers.D.value;
+        let name = registers.domain.value;
         let domainStmt = db.prepare(
             'SELECT ' +
                     'd.idDomains AS idDomains ' +
@@ -376,7 +380,7 @@ function executeRemoveMembersFromDomainQuery(idDomain, players)
  */
 function setDomainDetail(player, key, value)
 {
-    let name = registers.D.value;
+    let name = registers.domain.value;
     let idDomains = getIdDomainsByPlayerAndName(player, name).idDomains;
     key = key.toLowerCase();
     try {
@@ -432,7 +436,8 @@ function getDomainSecurity(room)
  */
 function fetchDomainDetails(player)
 {
-    let domainName = registers.D.value;
+    let domainName = registers.domain.value;
+
     try {
         let domainStmt = db.prepare(
             'SELECT ' +
@@ -533,12 +538,14 @@ Object.keys(process.env).filter(key=> key.match(/^MUSHQ_/)).forEach(function(key
     let reg = key.replace('MUSHQ_', '');
     let name = process.env[`MUSHQN_${reg}`];
     let value = process.env[key];
-    registers[reg]={
+    registers[name]={
         register:reg,
         name:name,
         value:value
     };
+
 });
+
 
 if(argvparts.length > 1)
 {

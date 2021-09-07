@@ -21,6 +21,8 @@
 &cmd.domain.leave zobj=$+domain/leave *:=[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], leaveDomain, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
 &inc.domain.name.test zobj=[regmatch(%0,lit(^[[:alnum:][:space:]]+$))]
 
+&inc.domain.test zobj=$+test:[setr(sample, sample)];[setr(another, another sample)];[execscript([u(con.domain.path)], testregisters)];
+
 &cmd.domain.admin.list zobj=$+domain/s/list:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], adminListDomains)])];[setq(formatted, [u(inc.domain.admin.format.list, [r(res)])])];@sudo %l=@pemit [r(user)]=[r(formatted)]
 &inc.domain.admin.format.list zobj = [center(Domain List,80,=)]%r[printf($-3s$-25s$-25s$-25s,id,Domain Name,Sphere,Owner)]%r[repeat(-,80)]%r[parse(%0,[u(inc.domain.admin.format.list.row, ##)],|,%r)]
 &inc.domain.admin.format.list.row zobj=[printf($-3s$-25s$-25s$-25s,[index(%0,~,1,1)], [index(%0,~,2,1)], name([index(%0,~,3,1)]), [name(index(%0,~,4,1))])]
