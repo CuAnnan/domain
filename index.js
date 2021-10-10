@@ -434,7 +434,7 @@ function getDomainSecurity(room)
  * @param player
  * @param domainName
  */
-function fetchDomainDetails(player)
+function fetchDomainDetails()
 {
     let domainName = registers.domain.value;
 
@@ -447,20 +447,25 @@ function fetchDomainDetails(player)
             'WHERE ' +
             'm.member = ? AND d.name = ?'
         );
-        let domainQry = domainStmt.get(player, domainName);
-        let {idDomains, owner} = domainQry;
-        let response = `Domain Name~${domainName}|Owner~${owner}`;
-        let members=getDomainRecords('member', idDomains);
-        response += `|Members~${members.join('*')}`;
-        let rooms = getDomainRecords('room', idDomains);
-        response += `|Rooms~${rooms.join('*')}`;
-        let detailsStmt = db.prepare('SELECT key, value FROM details WHERE idDomains = ?');
-        let detailsQry = detailsStmt.all(idDomains);
-        for(let detail of detailsQry)
-        {
-            response += `|${detail.key}~${detail.value}`;
+        let domainQry = domainStmt.get(registers.user.value, domainName);
+        if(domainQry) {
+            let {idDomains, owner} = domainQry;
+            let response = `Domain Name~${domainName}|Owner~${owner}`;
+            let members = getDomainRecords('member', idDomains);
+            response += `|Members~${members.join('*')}`;
+            let rooms = getDomainRecords('room', idDomains);
+            response += `|Rooms~${rooms.join('*')}`;
+            let detailsStmt = db.prepare('SELECT key, value FROM details WHERE idDomains = ?');
+            let detailsQry = detailsStmt.all(idDomains);
+            for (let detail of detailsQry) {
+                response += `|${detail.key}~${detail.value}`;
+            }
+            respond(response);
         }
-        respond(response);
+        else
+        {
+            respond(`You do not appear to be a member of the domain ${domainName}`);
+        }
     }catch(e){
         console.log(e);
     }
