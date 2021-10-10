@@ -488,6 +488,7 @@ function setFeedingMethod()
 function getFeedingMethod()
 {
     let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
+    console.log(registers.user.value);
     let qry = feedingStmt.get(registers.user.value);
     respond(qry.method);
 }
