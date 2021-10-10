@@ -494,7 +494,7 @@ function getFeedingMethod()
     }
     else
     {
-        respond("You do not have a feeding method set");
+        respond("-none-");
     }
 }
 
@@ -517,7 +517,7 @@ function getFeedingPool()
     }
     else
     {
-        respond("You have not set your feeding pool");
+        respond("-none-");
     }
 }
 
