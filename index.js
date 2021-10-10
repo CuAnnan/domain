@@ -489,7 +489,7 @@ function getFeedingMethod()
 {
     let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
     let qry = feedingStmt.get(registers.user.value);
-    if(qry.method) {
+    if(qry && qry.method) {
         respond(qry.method);
     }
     else
@@ -512,7 +512,7 @@ function getFeedingPool()
 {
     let feedingStmt = db.prepare('SELECT pool FROM feeding WHERE player = ?');
     let qry = feedingStmt.get(registers.user.value);
-    if(qry.pool) {
+    if(qry && qry.pool) {
         respond(qry.pool);
     }
     else
