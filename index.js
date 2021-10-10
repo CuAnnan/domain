@@ -448,6 +448,7 @@ function fetchDomainDetails()
             'm.member = ? AND d.name = ?'
         );
         let domainQry = domainStmt.get(registers.user.value, domainName);
+        console.log(registers.user.value, domainName);
         if(domainQry) {
             let {idDomains, owner} = domainQry;
             let response = `Domain Name~${domainName}|Owner~${owner}`;
