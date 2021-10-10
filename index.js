@@ -480,37 +480,32 @@ function getDomainRecords(recordType, idDomains)
 
 function setFeedingMethod()
 {
-    let player = registers.user.value;
-    let method = registers.method.value;
     let feedingStmt = db.prepare('INSERT INTO feeding (player, method) VALUES (?,?) ON CONFLICT DO UPDATE SET method = excluded.method');
-    feedingStmt.run(player, method);
-    console.log(player, method);
-    respond(`Set feeding method to ${method}`);
+    feedingStmt.run(registers.user.value, registers.method.value);
+    respond(`Set feeding method to ${registers.method.value}`);
 }
 
 function getFeedingMethod()
 {
-    let player = registers.user.value;
     let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
-    let qry = feedingStmt.get(player);
+    let qry = feedingStmt.get(registers.user.value);
     respond(qry.method);
 }
 
 /**
  * @param player
  */
-function setFeedingPool(player)
+function setFeedingPool()
 {
     let feedingStmt = db.prepare('INSERT INTO feeding (player, pool) VALUES (?,?) ON CONFLICT DO UPDATE SET pool = excluded.pool');
-    feedingStmt.run(player, registers.pool.value);
+    feedingStmt.run(registers.user.value, registers.pool.value);
     respond(`Set feeding pool to ${registers.pool.value}`);
 }
 
-function getFeedingPool(player)
+function getFeedingPool()
 {
     let feedingStmt = db.prepare('SELECT pool FROM feeding WHERE player = ?');
-    let qry = feedingStmt.get(player);
-    console.log(qry);
+    let qry = feedingStmt.get(registers.user.value);
     respond(qry.pool);
 }
 
