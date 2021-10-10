@@ -105,7 +105,7 @@ function adminListDomains()
  * @param room
  */
 function claimDomain(player, sphere, room) {
-    let name = registers.N.value;
+    let name = registers.name.value;
     db.exec('BEGIN TRANSACTION');
     try
     {
@@ -399,7 +399,7 @@ function setDomainDetail(player, key, value)
 
 function getDomainSecurity(room)
 {
-    let sphere = registers.S.value;
+    let sphere = registers.security.value;
 
     let stmt = db.prepare(
         'SELECT ' +
