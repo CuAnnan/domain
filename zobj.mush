@@ -1,42 +1,45 @@
 @create zobj=10
 @Desc zobj=Testing the Domain stuff
 &con.domain.path zobj =domain/index.js
-&CMD.DOMAIN.CLAIM zobj=$+Domain/claim *:[setq(user, %#)];[setq(name, %0)];@assert [u(inc.domain.name.test, %0)]={@sudo %l=@pemit [r(user)]=The name of a domain can only contain letters, numbers and spaces};[setq(res, [execscript([u(con.domain.path)], claimDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
+&CMD.DOMAIN.CLAIM zobj=$+Domain/claim *:[setq(user, %#)];[setq(name, %0)];@assert [u(inc.domain.name.test, %0)]={@pemit [r(user)]=The name of a domain can only contain letters, numbers and spaces};[setq(res, [execscript([u(con.domain.path)], claimDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@pemit [r(user)]=[r(res)]
+&CMD.DOMAIN.CLAIM.INVALID zobj=$+domain/claim:[setq(user, %#)];@pemit [r(user)]=The correct format for this command is +domain/claim <name of domain>.
 &CMD.DOMAIN.REVOKE zobj=$+domain/revoke *:@include me/fnc.domain.revoke=%0
-&CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@sudo %l=@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
-&fnc.domain.revoke zobj=[setq(user,%#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@sudo %l=@pemit [r(user)]=The domains you belong to:%r[r(res)]
-&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[parse(%1,[objid(*##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[parse(%1,[objid(*##)], ,|)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@sudo %l=@pemit [r(user)]=[r(frmt)]
+&CMD.DOMAIN.REVOKE.INVALID zobj=$+domain/revoke:[setq(user, %#)];@pemit [r(user)]=The correct format for this command is +domain/revoke <name of domain>.
+&fnc.domain.revoke zobj=[setq(user,%#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], revokeDomain, [objid(%#)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.listall zobj=$+domain/list:[setq(user, %#)];[setr(res, [execscript([u(con.domain.path)], getDomainNamesByPlayer, objid(%#))])];@pemit [r(user)]=The domains you belong to:%r[r(res)]
+&cmd.domain.addRoom zobj=$+domain/addRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addRoomToDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.removeRoom zobj=$+domain/removeRoom *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeRoomFromDomain, [objid(%#)]|[objid(parent(%#))]|[objid(%l)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.addMember zobj=$+domain/addMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], addMembersToDomain, [objid(%#)]|[parse(%1,[objid(*##)], ,|)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.removeMember zobj=$+domain/removeMember *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], removeMembersFromDomain, [objid(%#)]|[parse(%1,[objid(*##)], ,|)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.details zobj=$+domain/details *:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], fetchDomainDetails, [objid(%#)])])];[setq(frmt, u(inc.domain.format.details, [r(res)]))];@pemit [r(user)]=[r(frmt)]
 &inc.domain.format.details zobj = [parse(%0, [ifelse(gt(#@,1), [u(inc.domain.format.detail.nice, ##)],[u(inc.domain.format.name, ##)])],|,%r)]%r[repeat(-,80)]
 &inc.domain.format.name zobj=[center([index(%0,~,1,1)]: [index(%0,~,2,1)],80,-)]
 &inc.domain.format.detail.nice zobj = [setq(key, [index(%0,~,1,1)])][setq(value,index(%0,~,2,1))][setq(formattedValue,[ifelse(isnum([r(value)]),[r(value)],parse([r(value)],name(##),*,%,%b))])][u(inc.domain.format.detail.printf,r(key),r(formattedValue))]
 &inc.domain.format.detail.printf zobj=[printf($.1:|:&s$-14s$&65s,%r,[capstr(%0)],wrap(%1,63,l,|,|))]
-&cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(domain, %0)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%1]|[%2])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.transfer zobj=$+domain/transfer *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript(u(con.domain.path), transferDomain, [objid(%#)]|[objid(*%1)])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.domain.leave zobj=$+domain/leave *:=[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], leaveDomain, [objid(%#)])])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.domain.setDetail zobj=$+domain/setDetail */*=*:[setq(user, %#)];[setq(domain, %0)];[setq(res,[execscript([u(con.domain.path)], setDomainDetail, [objid(%#)]|[%1]|[%2])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.transfer zobj=$+domain/transfer *=*:[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript(u(con.domain.path), transferDomain, [objid(%#)]|[objid(*%1)])])];@pemit [r(user)]=[r(res)]
+&cmd.domain.leave zobj=$+domain/leave *:=[setq(user, %#)];[setq(domain, %0)];[setq(res, [execscript([u(con.domain.path)], leaveDomain, [objid(%#)])])];@pemit [r(user)]=[r(res)]
 &inc.domain.name.test zobj=[regmatch(%0,lit(^[[:alnum:][:space:]]+$))]
+
+&cmd.domain.help zobj=$+domain/help:@pemit %#=[center(%xhDomain Help%xn,=,1,1)]
+
 
 &inc.domain.test zobj=$+test:[setr(sample, sample)];[setr(another, another sample)];[execscript([u(con.domain.path)], testregisters)];
 
-&cmd.domain.admin.list zobj=$+domain/s/list:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], adminListDomains)])];[setq(formatted, [u(inc.domain.admin.format.list, [r(res)])])];@sudo %l=@pemit [r(user)]=[r(formatted)]
+&cmd.domain.admin.list zobj=$+domain/s/list:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], adminListDomains)])];[setq(formatted, [u(inc.domain.admin.format.list, [r(res)])])];@pemit [r(user)]=[r(formatted)]
 &inc.domain.admin.format.list zobj = [center(Domain List,80,=)]%r[printf($-3s$-25s$-25s$-25s,id,Domain Name,Sphere,Owner)]%r[repeat(-,80)]%r[parse(%0,[u(inc.domain.admin.format.list.row, ##)],|,%r)]
 &inc.domain.admin.format.list.row zobj=[printf($-3s$-25s$-25s$-25s,[index(%0,~,1,1)], [index(%0,~,2,1)], name([index(%0,~,3,1)]), [name(index(%0,~,4,1))])]
 @set zobj/cmd.domain.admin.list=wizard
 
-&cmd.feeding.setMethod zobj=$+feed/method *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.feeding.getMethod zobj=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod, [objid(%#)])])];@sudo %l=@pemit [r(user)]=Your feeding method is listed as [r(res)]
-&cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@sudo %l=@pemit [r(user)]=[r(res)]
-&cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [u(inc.feeding.getPool)])];@sudo %l=@pemit [r(user)]=[r(res)]
+&cmd.feeding.setMethod zobj=$+feed/method *:[setq(user, %#)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod, [objid(%#)]|[%0])])];@pemit [r(user)]=[r(res)]
+&cmd.feeding.getMethod zobj=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod, [objid(%#)])])];@pemit [r(user)]=Your feeding method is listed as [r(res)]
+&cmd.feeding.setPool zobj=$+feed/pool  *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@pemit [r(user)]=[r(res)]
+&cmd.feeding.getPool zobj=$+feed/pool:[setq(user,%#)];[setq(res, [u(inc.feeding.getPool)])];@pemit [r(user)]=[r(res)]
 &inc.feeding.getPool zobj=[execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])]
 
-&cmd.feeding.feed zobj=$+feed/here:@include me/inc.domain.getFeedingDetails;@sudo %l=@pemit [r(user)]=+roll [r(pool)] vs [r(diff)]
+&cmd.feeding.feed zobj=$+feed/here:@include me/inc.domain.getFeedingDetails;@pemit [r(user)]=+roll [r(pool)] vs [r(diff)]
 
-&inc.domain.getFeedingDetails zobj=[setq(user, %#)];[setq(pool, execscript([u(con.domain.path)], getFeedingPool, [objid(%#)]))];[setq(sphere, objid(parent(%#)))];@dolist/inline/delimit | [execscript([u(con.domain.path)], getDomainSecurity, [objid(%l)])]=@include me/inc.feed.parseFeedingDetails = ##;@include me/inc.domain.playerIsMember;@include me/inc.feed.calculateDifficulty;[pushregs(1)];@sudo %l=@pemit [r(user)]=[r(pool)]
+&inc.domain.getFeedingDetails zobj=[setq(user, %#)];[setq(pool, execscript([u(con.domain.path)], getFeedingPool, [objid(%#)]))];[setq(sphere, objid(parent(%#)))];@dolist/inline/delimit | [execscript([u(con.domain.path)], getDomainSecurity, [objid(%l)])]=@include me/inc.feed.parseFeedingDetails = ##;@include me/inc.domain.playerIsMember;@include me/inc.feed.calculateDifficulty;[pushregs(1)];@pemit [r(user)]=[r(pool)]
 &inc.feed.parseFeedingDetails zobj=[setq([index(%0,:,1,1)],[index(%0,:,2,1)])];
 &inc.feed.calculateDifficulty zobj=[setq(diff, ifelse(r(member),max(3, diff(u(var.security), r(rating))),add(u(var.security), r(security))))];
 
