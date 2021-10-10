@@ -482,6 +482,7 @@ function setFeedingMethod()
 {
     let player = registers.user.value;
     let method = registers.method.value;
+    console.log(registers);
     let feedingStmt = db.prepare('INSERT INTO feeding (player, method) VALUES (?,?) ON CONFLICT DO UPDATE SET method = excluded.method');
     feedingStmt.run(player, method);
     respond(`Set feeding method to ${method}`);
