@@ -488,9 +488,14 @@ function setFeedingMethod()
 function getFeedingMethod()
 {
     let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
-    console.log(registers.user.value);
     let qry = feedingStmt.get(registers.user.value);
-    respond(qry.method);
+    if(qry.method) {
+        respond(qry.method);
+    }
+    else
+    {
+        respond("You do not have a feeding method set");
+    }
 }
 
 /**
@@ -507,7 +512,13 @@ function getFeedingPool()
 {
     let feedingStmt = db.prepare('SELECT pool FROM feeding WHERE player = ?');
     let qry = feedingStmt.get(registers.user.value);
-    respond(qry.pool);
+    if(qry.pool) {
+        respond(qry.pool);
+    }
+    else
+    {
+        respond("You have not set your feeding pool");
+    }
 }
 
 function parseCommand(command, args)
