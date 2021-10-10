@@ -478,15 +478,18 @@ function getDomainRecords(recordType, idDomains)
     return records;
 }
 
-function setFeedingMethod(player, method)
+function setFeedingMethod()
 {
+    let player = registers.user.value;
+    let method = registers.method.value;
     let feedingStmt = db.prepare('INSERT INTO feeding (player, method) VALUES (?,?) ON CONFLICT DO UPDATE SET method = excluded.method');
     feedingStmt.run(player, method);
     respond(`Set feeding method to ${method}`);
 }
 
-function getFeedingMethod(player)
+function getFeedingMethod()
 {
+    let player = registers.user.value;
     let feedingStmt = db.prepare('SELECT method FROM feeding WHERE player = ?');
     let qry = feedingStmt.get(player);
     respond(qry.method);
