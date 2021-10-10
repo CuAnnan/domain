@@ -498,8 +498,8 @@ function getFeedingMethod(player)
 function setFeedingPool(player)
 {
     let feedingStmt = db.prepare('INSERT INTO feeding (player, pool) VALUES (?,?) ON CONFLICT DO UPDATE SET pool = excluded.pool');
-    feedingStmt.run(player, registers['P'].value);
-    respond(`Set feeding pool to ${registers['P'].value}`);
+    feedingStmt.run(player, registers.pool.value);
+    respond(`Set feeding pool to ${registers.pool.value}`);
 }
 
 function getFeedingPool(player)
