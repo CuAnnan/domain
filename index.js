@@ -484,6 +484,7 @@ function setFeedingMethod()
     let method = registers.method.value;
     let feedingStmt = db.prepare('INSERT INTO feeding (player, method) VALUES (?,?) ON CONFLICT DO UPDATE SET method = excluded.method');
     feedingStmt.run(player, method);
+    console.log(player, method);
     respond(`Set feeding method to ${method}`);
 }
 
@@ -509,6 +510,7 @@ function getFeedingPool(player)
 {
     let feedingStmt = db.prepare('SELECT pool FROM feeding WHERE player = ?');
     let qry = feedingStmt.get(player);
+    console.log(qry);
     respond(qry.pool);
 }
 
