@@ -27,10 +27,9 @@
 &INC.DOMAIN.ADMIN.FORMAT.LIST Domain and Feeding Code=[center(Domain List,80,=)]%r[printf($-3s$-25s$-25s$-25s,id,Domain Name,Sphere,Owner)]%r[repeat(-,80)]%r[parse(%0,[u(inc.domain.admin.format.list.row, ##)],|,%r)]
 &INC.DOMAIN.ADMIN.FORMAT.LIST.ROW Domain and Feeding Code=[printf($-3s$-25s$-25s$-25s,[index(%0,~,1,1)], [index(%0,~,2,1)], name([index(%0,~,3,1)]), [name(index(%0,~,4,1))])]
 &CMD.FEEDING.SETMETHOD Domain and Feeding Code=$+feed/method *:[setq(user, [objid(%#)])];[setq(method, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingMethod)])];@pemit [r(user)]=[r(res)]
-&CMD.FEEDING.GETMETHOD Domain and Feeding Code=$+feed/method:[setq(user, %#)]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod)])];@pemit [r(user)]=Your feeding method is listed as [r(res)]
-&CMD.FEEDING.SETPOOL Domain and Feeding Code=$+feed/pool *:[setq(user, %#)];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool, [objid(%#)]|[%0])])];@pemit [r(user)]=[r(res)]
-&CMD.FEEDING.GETPOOL Domain and Feeding Code=$+feed/pool:[setq(user,%#)];[setq(res, [u(inc.feeding.getPool)])];@pemit [r(user)]=[r(res)]
-&INC.FEEDING.GETPOOL Domain and Feeding Code=[execscript([u(con.domain.path)], getFeedingPool, [objid(%#)])]
+&CMD.FEEDING.GETMETHOD Domain and Feeding Code=$+feed/method:[setq(user, [objid(%#)])]:[setq(res, [execscript([u(con.domain.path)], getFeedingMethod)])];@pemit [r(user)]=Your feeding method is listed as [r(res)]
+&CMD.FEEDING.SETPOOL Domain and Feeding Code=$+feed/pool *:[setq(user, [objid(%#)])];[setq(pool, %0)];[setq(res, [execscript([u(con.domain.path)], setFeedingPool)])];@pemit [r(user)]=[r(res)]
+&CMD.FEEDING.GETPOOL Domain and Feeding Code=$+feed/pool:[setq(user,[objid(%#)])];[setq(res, [execscript([u(con.domain.path)], getFeedingPool)])];@pemit [r(user)]=[r(res)]
 &CMD.FEEDING.FEED Domain and Feeding Code=$+feed/here:@include me/inc.domain.getFeedingDetails;@pemit [r(user)]=+roll [r(pool)] vs [r(diff)]
 &INC.DOMAIN.GETFEEDINGDETAILS Domain and Feeding Code=[setq(user, %#)];[setq(pool, execscript([u(con.domain.path)], getFeedingPool, [objid(%#)]))];[setq(sphere, objid(parent(%#)))];@dolist/inline/delimit | [execscript([u(con.domain.path)], getDomainSecurity, [objid(%l)])]=@include me/inc.feed.parseFeedingDetails = ##;@include me/inc.domain.playerIsMember;@include me/inc.feed.calculateDifficulty;[pushregs(1)];@pemit [r(user)]=[r(pool)]
 &INC.FEED.PARSEFEEDINGDETAILS Domain and Feeding Code=[setq([index(%0,:,1,1)],[index(%0,:,2,1)])];
