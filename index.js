@@ -445,7 +445,7 @@ function fetchDomainDetails()
             'FROM ' +
             'domains d LEFT JOIN members m USING(idDomains) ' +
             'WHERE ' +
-            'm.member = ? AND d.name = ?'
+            'm.member = ? AND d.namey = ?'
         );
         let domainQry = domainStmt.get(registers.user.value, domainName);
         if(domainQry) {
