@@ -580,6 +580,7 @@ function grantBoon()
     }
     catch(e)
     {
+        console.log(e);
         respond("0");
     }
 
