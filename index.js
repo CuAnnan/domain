@@ -83,7 +83,11 @@ function* convertStringTo128Bit(string)
 function respond(string)
 {
     let response = '';
-    for(let char of convertStringTo128Bit(string))
+    if(!isNaN(string))
+    {
+        string = ""+string;
+    }
+    for(let char of convertStringTo128Bit(string.toString()))
     {
         response += char;
     }
