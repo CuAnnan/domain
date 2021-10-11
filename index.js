@@ -34,6 +34,7 @@ const functions = {
     'transferDomain':transferDomain,
     'leaveDomain':leaveDomain,
     'adminListDomains':adminListDomains,
+    'adminFetchDomainDetails':adminFetchDomainDetails,
     'testregisters':function()
     {
         console.log(registers);
@@ -427,12 +428,49 @@ function getDomainSecurity(room)
     respond(response.join('|'));
 }
 
+function adminFetchDomainDetails()
+{
+    let domainName = registers.domain.value;
+    let domainStmt = db.prepare(
+        'SELECT ' +
+        'd.name AS name, d.idDomains AS idDomains, d.owner AS owner ' +
+        'FROM ' +
+        'domains d LEFT JOIN members m USING(idDomains) ' +
+        'WHERE ' +
+        'd.name = ?'
+    );
+    let domainQry = domainStmt.get(domainName);
+    if(domainQry)
+    {
+        processDomainDetailsQry(domainQry);
+    }
+    else
+    {
+        respond(`No domain named ${domainName}`);
+    }
+}
+
+function processDomainDetailsQry(domainQry)
+{
+    let {idDomains, owner} = domainQry;
+    let response = `Domain Name~${domainQry.name}|Owner~${owner}`;
+    let members = getDomainRecords('member', idDomains);
+    response += `|Members~${members.join('*')}`;
+    let rooms = getDomainRecords('room', idDomains);
+    response += `|Rooms~${rooms.join('*')}`;
+    let detailsStmt = db.prepare('SELECT key, value FROM details WHERE idDomains = ?');
+    let detailsQry = detailsStmt.all(idDomains);
+    for (let detail of detailsQry)
+    {
+        response += `|${detail.key}~${detail.value}`;
+    }
+    respond(response);
+}
+
 /**
  * This function finds the domain named <domainName> that the <player> is a member of and returns the detaisl
  * The details are returned as a single string not ready for display and so the zone object will need to format
  * accordingly.
- * @param player
- * @param domainName
  */
 function fetchDomainDetails()
 {
@@ -445,22 +483,11 @@ function fetchDomainDetails()
             'FROM ' +
             'domains d LEFT JOIN members m USING(idDomains) ' +
             'WHERE ' +
-            'm.member = ? AND d.namey = ?'
+            'm.member = ? AND d.name = ?'
         );
         let domainQry = domainStmt.get(registers.user.value, domainName);
         if(domainQry) {
-            let {idDomains, owner} = domainQry;
-            let response = `Domain Name~${domainName}|Owner~${owner}`;
-            let members = getDomainRecords('member', idDomains);
-            response += `|Members~${members.join('*')}`;
-            let rooms = getDomainRecords('room', idDomains);
-            response += `|Rooms~${rooms.join('*')}`;
-            let detailsStmt = db.prepare('SELECT key, value FROM details WHERE idDomains = ?');
-            let detailsQry = detailsStmt.all(idDomains);
-            for (let detail of detailsQry) {
-                response += `|${detail.key}~${detail.value}`;
-            }
-            respond(response);
+            processDomainDetailsQry(domainQry);
         }
         else
         {
