@@ -568,8 +568,6 @@ function grantBoon()
     let to = registers.to.value;
     let magnitude = registers.magnitude.value;
     let date = Date.now();
-    respond(`From: ${from}. To: ${to}. Magnitude: ${magnitude}. Date: ${date}`);
-    return;
     try {
         let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, date) VALUES (?, ?, ?, ?, ?, ?)');
         let boonQry = boonStmt.run(magnitude, from, to, to, 1, date);
