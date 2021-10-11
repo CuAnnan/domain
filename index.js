@@ -576,7 +576,8 @@ function grantBoon()
     }
     catch(e)
     {
-        respond("0")
+        console.log(e);
+        respond("0");
     }
 
 }
