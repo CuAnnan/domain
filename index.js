@@ -35,6 +35,12 @@ const functions = {
     'leaveDomain':leaveDomain,
     'adminListDomains':adminListDomains,
     'adminFetchDomainDetails':adminFetchDomainDetails,
+    'grantBoon':grantBoon,
+    'requestBoon':requestBoon,
+    'dischargeBoon':dischargeBoon,
+    'acknowledgeBoon':acknowledgeBoon,
+    'showBoons':showBoons,
+    'transferBoon':transferBoon,
     'testregisters':function()
     {
         console.log(registers);
@@ -552,6 +558,64 @@ function getFeedingPool()
         respond("-none-");
     }
 }
+
+/**
+ * When a player grants a boon, it is automatically validated. When a player *requests* a boon, it is not.
+ */
+function grantBoon()
+{
+    let from=registers.from.value;
+    let to = registers.to.value;
+    let magnitude = registers.magnitude.value;
+    let date = Date.now();
+    try {
+        let boonStmt = db.prepare('INSERT INTO boons (magnitude, from, to, holder, validated, date) VALUES (?, ?, ?, ?, ?, ?)');
+        let boonQry = boonStmt.run(magnitude, from, to, to, 1, date);
+        let boonId = boonQry.lastInsertRowid;
+        respond(boonId);
+    }
+    catch(e)
+    {
+        respond('#-1')
+    }
+
+}
+
+function requestBoon()
+{
+
+}
+
+function validateBoon()
+{
+
+}
+
+function rejectBoon()
+{
+
+}
+
+function acknowledgeBoon()
+{
+
+}
+
+function showBoons()
+{
+
+}
+
+function transferBoon()
+{
+
+}
+
+function dischargeBoon()
+{
+
+}
+
 
 function parseCommand(command, args)
 {
