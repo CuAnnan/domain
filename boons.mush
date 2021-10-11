@@ -1,0 +1,6 @@
+@create boons wrapper=10
+&CON.SCRIPT.PATH boons=domain/index.js
+&cmd.boon.grant boons=$+boon/grant */*:@assert !comp(type(*%0), PLAYER)=@pemit %#=%0 is not a player.;[setq(from, objid(%#))];[setq(to, objid(*%0))];[setq(magnitude, %1)];[setq(response, [execscript(u(con.script.path), grantBoon)])];
+
+@set boons=ARCHITECT SAFE INHERIT SIDEFX
+@power/councilor boons=EXECSCRIPT
