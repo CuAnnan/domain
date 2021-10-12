@@ -587,7 +587,6 @@ function grantBoon()
 
 function showBoons()
 {
-    console.log("Within boons command");
     try {
         let bit = registers.player.value;
         let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
@@ -649,7 +648,6 @@ function parseCommand(command, args)
     let func;
     let functionKeys = Object.keys(functions);
     if(functionKeys.indexOf(command) >=0) {
-        console.log(command);
         func = functions[command];
         try {
             if (args) {
