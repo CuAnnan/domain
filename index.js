@@ -649,6 +649,7 @@ function parseCommand(command, args)
     let func;
     let functionKeys = Object.keys(functions);
     if(functionKeys.indexOf(command) >=0) {
+        console.log(command);
         func = functions[command];
         try {
             if (args) {
