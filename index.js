@@ -587,7 +587,8 @@ function grantBoon()
 
 function showBoons()
 {
-    let bit = registers.from.value;
+    let bit = registers.player.value;
+    console.log(bit);
     try {
         let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
         let boonsQry = boonsStmt.run(bit, bit);
