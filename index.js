@@ -597,7 +597,7 @@ function showBoons()
             for (let boonRow of boonsQry) {
                 boons.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
             }
-            let responseText = boons.join('#');
+            let responseText = boons.join('~');
             respond(responseText);
         }
         else
