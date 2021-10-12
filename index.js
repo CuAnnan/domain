@@ -590,9 +590,10 @@ function showBoons()
     try {
         let bit = registers.player.value;
         let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
-        let boonsQry = boonsStmt.run(bit, bit);
+        let boonsQry = boonsStmt.all(bit, bit);
         if (boonsQry) {
             let boons = [];
+
             for (let boonRow of boonsQry) {
                 boons.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
             }
