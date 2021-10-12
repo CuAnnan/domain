@@ -580,11 +580,32 @@ function grantBoon()
     }
     catch(e)
     {
-        console.log(e);
         respond("0");
     }
 
 }
+
+function showBoons()
+{
+    let bit = registers.from.value;
+    try {
+        let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
+        let boonsQry = boonsStmt.run(bit, bit);
+        if (boonsQry) {
+            let boons = [];
+            for (let boonRow of boonsQry) {
+                boons.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
+            }
+            let responseText = boons.join('#');
+            respond(responseText);
+        }
+    }catch(e){
+        console.log(e);
+        respond(0);
+    }
+
+}
+
 
 function requestBoon()
 {
@@ -606,10 +627,6 @@ function acknowledgeBoon()
 
 }
 
-function showBoons()
-{
-
-}
 
 function transferBoon()
 {
