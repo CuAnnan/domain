@@ -600,6 +600,10 @@ function showBoons()
             let responseText = boons.join('#');
             respond(responseText);
         }
+        else
+        {
+            respond("No boons found in your ledger.");
+        }
     }catch(e){
         console.log(e);
         respond(0);
