@@ -563,28 +563,6 @@ function getFeedingPool()
     }
 }
 
-/**
- * When a player grants a boon, it is automatically validated. When a player *requests* a boon, it is not.
- */
-function grantBoon()
-{
-    let from=registers.from.value;
-    let to = registers.to.value;
-    let magnitude = registers.magnitude.value;
-    let date = Date.now();
-    try {
-        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, date) VALUES (?, ?, ?, ?, ?, ?)');
-        let boonQry = boonStmt.run(magnitude, from, to, to, 1, date);
-        let boonId = boonQry.lastInsertRowid;
-        respond(boonId);
-    }
-    catch(e)
-    {
-        respond("0");
-    }
-
-}
-
 function showBoons()
 {
     try {
@@ -624,10 +602,59 @@ function showBoons()
 
 }
 
-
-function requestBoon()
+function addNewBoonToDB(dataObject)
 {
+    let boon = {
+        from:dataObject.from,
+        to:dataObject.to,
+        magnitude:dataObject.magnitude,
+        validated:dataObject.validated?1:0,
+        acknowledged:dataObject.acknowledged?1:0
+    };
+    let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged) VALUES (?, ?, ?, ?, ?, ?)');
+    let boonQry = boonStmt.run(boon.magnitude, boon.from, boon.to, boon.to, boon.validated, boon.acknowledged);
+    let boonId = boonQry.lastInsertRowid;
+    return boonId;
+}
 
+/**
+ * When a player grants a boon, it is automatically validated. When a player *requests* a boon, it is not.
+ */
+function grantBoon()
+{
+    let from=registers.from.value;
+    let to = registers.to.value;
+    let magnitude = registers.magnitude.value;
+    try {
+        respond(addNewBoonToDB({
+                magnitude:magnitude,
+                from:from,
+                to:to,
+                validated:1
+        }));
+    }
+    catch(e)
+    {
+        respond("0");
+    }
+}
+
+function claimBoon()
+{
+    let from=registers.from.value;
+    let to = registers.to.value;
+    let magnitude = registers.magnitude.value;
+    let date = Date.now();
+    try {
+        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, date) VALUES (?, ?, ?, ?, ?, ?)');
+        let boonQry = boonStmt.run(magnitude, from, to, to, 0, date);
+        let boonId = boonQry.lastInsertRowid;
+        respond(boonId);
+    }
+    catch(e)
+    {
+        respond("0");
+    }
 }
 
 function validateBoon()
