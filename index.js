@@ -596,6 +596,7 @@ function showBoons()
             let boonsOwing = [];
 
             for (let boonRow of boonsQry) {
+                boonRow.date /=1000;
                 if(boonRow.bitFrom === bit)
                 {
                     boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
