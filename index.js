@@ -609,7 +609,7 @@ function showBoons()
             let responseText = [
                 "Boons Owed>"+boonsOwed.join('~'),
                 "Boons Owing>"+boonsOwing.join('~')
-            ].join('~~');
+            ].join('^');
 
             respond(responseText);
         }
