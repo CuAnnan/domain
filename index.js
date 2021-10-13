@@ -620,7 +620,7 @@ function validateBoon()
 {
     try{
         let boonStmt = db.prepare('UPDATE boons SET validated = 1 WHERE id=? AND boonFrom=?');
-        boonStmt.run(registers.boonId.value, registers.player.value);
+        boonStmt.run(registers.id.value, registers.player.value);
         respond(1);
     }
     catch(e)
