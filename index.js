@@ -619,7 +619,7 @@ function addNewBoonToDB()
 function validateBoon()
 {
     try{
-        let boonStmt = db.prepare('UPDATE boons SET validated = 1 WHERE id=? AND boonFrom=?');
+        let boonStmt = db.prepare('UPDATE boons SET validated = 1 WHERE id=? AND bitFrom=?');
         boonStmt.run(registers.id.value, registers.player.value);
         respond(1);
     }
