@@ -36,7 +36,7 @@ const functions = {
     'adminListDomains':adminListDomains,
     'adminFetchDomainDetails':adminFetchDomainDetails,
     'grantBoon':grantBoon,
-    'requestBoon':requestBoon,
+    'claimBoon':claimBoon,
     'dischargeBoon':dischargeBoon,
     'acknowledgeBoon':acknowledgeBoon,
     'showBoons':showBoons,
@@ -625,13 +625,9 @@ function grantBoon()
     let from=registers.from.value;
     let to = registers.to.value;
     let magnitude = registers.magnitude.value;
-    try {
-        respond(addNewBoonToDB({
-                magnitude:magnitude,
-                from:from,
-                to:to,
-                validated:1
-        }));
+    try
+    {
+        respond(addNewBoonToDB({magnitude:magnitude,from:from,to:to,validated:1}));
     }
     catch(e)
     {
@@ -644,12 +640,9 @@ function claimBoon()
     let from=registers.from.value;
     let to = registers.to.value;
     let magnitude = registers.magnitude.value;
-    let date = Date.now();
-    try {
-        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, date) VALUES (?, ?, ?, ?, ?, ?)');
-        let boonQry = boonStmt.run(magnitude, from, to, to, 0, date);
-        let boonId = boonQry.lastInsertRowid;
-        respond(boonId);
+    try
+    {
+        respond(addNewBoonToDB({magnitude:magnitude,from:from,to:to}));
     }
     catch(e)
     {
