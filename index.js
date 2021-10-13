@@ -606,7 +606,10 @@ function showBoons()
                     boonsOwed.push(boonData);
                 }
             }
-            let responseText = [boonsOwed.join('~'), boonsOwing.join('~')].join('~~');
+            let responseText = [
+                "Boons Owed>"+boonsOwed.join('~'),
+                "Boons Owing>"+boonsOwing.join('~')
+            ].join('~~');
 
             respond(responseText);
         }
