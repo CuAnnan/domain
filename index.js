@@ -572,7 +572,6 @@ function showBoons()
         if (boonsQry) {
             let boonsOwed = [];
             let boonsOwing = [];
-
             for (let boonRow of boonsQry) {
                 boonRow.date /=1000;
                 if(boonRow.bitFrom === bit)
@@ -584,11 +583,7 @@ function showBoons()
                     boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
             }
-            let responseText = [
-                "Boons Owed>"+boonsOwed.join('~'),
-                "Boons Owing>"+boonsOwing.join('~')
-            ].join('^');
-
+            let responseText = ["Boons Owed>"+boonsOwed.join('~'),"Boons Owing>"+boonsOwing.join('~')].join('^');
             respond(responseText);
         }
         else
