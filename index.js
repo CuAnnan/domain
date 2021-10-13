@@ -592,12 +592,22 @@ function showBoons()
         let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
         let boonsQry = boonsStmt.all(bit, bit);
         if (boonsQry) {
-            let boons = [];
+            let boonsOwed = [];
+            let boonsOwing = [];
 
             for (let boonRow of boonsQry) {
-                boons.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
+                let boonData = `${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`;
+                if(boonRow.bitFrom === bit)
+                {
+                    boonsOwing.push(boonData);
+                }
+                else
+                {
+                    boonsOwed.push(boonData);
+                }
             }
-            let responseText = boons.join('~');
+            let responseText = [boonsOwed.join('~'), boonsOwing.join('~')].join('~~');
+
             respond(responseText);
         }
         else
