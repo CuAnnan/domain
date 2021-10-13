@@ -35,8 +35,7 @@ const functions = {
     'leaveDomain':leaveDomain,
     'adminListDomains':adminListDomains,
     'adminFetchDomainDetails':adminFetchDomainDetails,
-    'grantBoon':grantBoon,
-    'claimBoon':claimBoon,
+    'addNewBoonToDB':addNewBoonToDB,
     'dischargeBoon':dischargeBoon,
     'acknowledgeBoon':acknowledgeBoon,
     'showBoons':showBoons,
@@ -597,51 +596,21 @@ function showBoons()
 
 }
 
-function addNewBoonToDB(dataObject)
+function addNewBoonToDB()
 {
-    let boon = {
-        from:dataObject.from,
-        to:dataObject.to,
-        magnitude:dataObject.magnitude,
-        validated:dataObject.validated?1:0,
-        acknowledged:dataObject.acknowledged?1:0
-    };
-    let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged) VALUES (?, ?, ?, ?, ?, ?)');
-    let boonQry = boonStmt.run(boon.magnitude, boon.from, boon.to, boon.to, boon.validated, boon.acknowledged);
-    let boonId = boonQry.lastInsertRowid;
-    return boonId;
-}
-
-/**
- * When a player grants a boon, it is automatically validated. When a player *requests* a boon, it is not.
- */
-function grantBoon()
-{
-    let from=registers.from.value;
-    let to = registers.to.value;
-    let magnitude = registers.magnitude.value;
-    try
+    try {
+        let boon = {
+            from: registers.from.value,
+            to: registers.to.value,
+            validated: registers.validated.value?1:0,
+            acknowledged: registers.validated.value?1:0
+        };
+        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged, date) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        let boonQry = boonStmt.run(boon.magnitude, boon.from, boon.to, boon.to, boon.validated, boon.acknowledged, Date.now());
+        respond(boonQry.lastInsertRowid);
+    }catch(e)
     {
-        respond(addNewBoonToDB({magnitude:magnitude,from:from,to:to,validated:1}));
-    }
-    catch(e)
-    {
-        respond("0");
-    }
-}
-
-function claimBoon()
-{
-    let from=registers.from.value;
-    let to = registers.to.value;
-    let magnitude = registers.magnitude.value;
-    try
-    {
-        respond(addNewBoonToDB({magnitude:magnitude,from:from,to:to}));
-    }
-    catch(e)
-    {
-        respond("0");
+        respond(0);
     }
 }
 
