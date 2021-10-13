@@ -620,7 +620,7 @@ function rejectBoon()
     {
         let boonCountStmt = db.prepare('SELECT COUNT(idBoons) AS cnt FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0');
         let boonCountQry=boonCountStmt.run(registers.id.value, registers.player.value);
-        console.log(boonCountQry.cnt)
+        console.log(boonCountQry)
         if(boonCountQry.cnt < 1)
         {
             respond(-1);
