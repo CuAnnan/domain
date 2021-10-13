@@ -603,7 +603,7 @@ function addNewBoonToDB()
             from: registers.from.value,
             to: registers.to.value,
             validated: registers.validated.value?1:0,
-            acknowledged: registers.validated.value?1:0,
+            acknowledged: registers.acknowledged.value?1:0,
             magnitude:registers.magnitude.value
         };
         let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged, date) VALUES (?, ?, ?, ?, ?, ?, ?)');
