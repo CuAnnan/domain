@@ -625,6 +625,7 @@ function validateBoon()
     }
     catch(e)
     {
+        console.log(e);
         respond(0);
     }
 }
