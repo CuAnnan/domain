@@ -631,7 +631,25 @@ function validateBoon()
 
 function rejectBoon()
 {
-
+    try
+    {
+        let boonCountStmt = db.prepare('SELECT COUNT(idBoons) AS cnt FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0');
+        boonCountStmt=boonCountStmt.run(registers.id.value, registers.player.value);
+        if(boonCountStmt.cnt < 1)
+        {
+            respond(-1);
+        }
+        else
+        {
+            let boonStmt = db.prepare('DELETE FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0');
+            boonStmt.run(registers.id.value, registers.player.value);
+            respond(1);
+        }
+    }
+    catch(e)
+    {
+        respond(0);
+    }
 }
 
 function acknowledgeBoon()
