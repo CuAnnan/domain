@@ -615,11 +615,13 @@ function validateBoon()
 
 function rejectBoon()
 {
+    console.log(registers);
     try
     {
         let boonCountStmt = db.prepare('SELECT COUNT(idBoons) AS cnt FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0');
-        boonCountStmt=boonCountStmt.run(registers.id.value, registers.player.value);
-        if(boonCountStmt.cnt < 1)
+        let boonCountQry=boonCountStmt.run(registers.id.value, registers.player.value);
+        console.log(boonCountQry.cnt)
+        if(boonCountQry.cnt < 1)
         {
             respond(-1);
         }
