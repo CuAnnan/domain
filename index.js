@@ -36,6 +36,7 @@ const functions = {
     'adminListDomains':adminListDomains,
     'adminFetchDomainDetails':adminFetchDomainDetails,
     'addNewBoonToDB':addNewBoonToDB,
+    'validateBoon':validateBoon,
     'dischargeBoon':dischargeBoon,
     'acknowledgeBoon':acknowledgeBoon,
     'showBoons':showBoons,
@@ -617,7 +618,15 @@ function addNewBoonToDB()
 
 function validateBoon()
 {
-
+    try{
+        let boonStmt = db.prepare('UPDATE boons SET validated = 1 WHERE id=? AND boonFrom=?');
+        boonStmt.run(registers.boonId.value, registers.player.value);
+        respond(1);
+    }
+    catch(e)
+    {
+        respond(0);
+    }
 }
 
 function rejectBoon()
