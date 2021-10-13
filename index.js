@@ -37,8 +37,8 @@ const functions = {
     'adminFetchDomainDetails':adminFetchDomainDetails,
     'addNewBoonToDB':addNewBoonToDB,
     'validateBoon':validateBoon,
-    'dischargeBoon':dischargeBoon,
-    'rejectBoon':rejectBoon
+    'rejectBoon':rejectBoon,
+    'showBoons':showBoons,
 };
 
 /**
