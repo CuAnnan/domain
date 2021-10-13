@@ -38,23 +38,7 @@ const functions = {
     'addNewBoonToDB':addNewBoonToDB,
     'validateBoon':validateBoon,
     'dischargeBoon':dischargeBoon,
-    'acknowledgeBoon':acknowledgeBoon,
-    'showBoons':showBoons,
-    'transferBoon':transferBoon,
-    'testregisters':function()
-    {
-        console.log(registers);
-    },
-    'test':async function(){
-        let p = new Promise((resolve, reject)=>{
-            setTimeout(()=>{
-                resolve();
-            },2000);
-        });
-        p.then(()=>{
-            respond('This is how promises work');
-        });
-    }
+    'rejectBoon':rejectBoon
 };
 
 /**
