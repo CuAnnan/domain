@@ -596,14 +596,13 @@ function showBoons()
             let boonsOwing = [];
 
             for (let boonRow of boonsQry) {
-                let boonData = `${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.bitTo}|${boonRow.bitHolder}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`;
                 if(boonRow.bitFrom === bit)
                 {
-                    boonsOwing.push(boonData);
+                    boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
                 else
                 {
-                    boonsOwed.push(boonData);
+                    boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
             }
             let responseText = [
