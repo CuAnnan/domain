@@ -639,6 +639,7 @@ function rejectBoon()
 
 function acknowledgeBoon()
 {
+    console.log(registers.id.value);
     try
     {
         let boonStmt = db.prepare('UPDATE boons SET acknowledged = 1 WHERE idBoons = ?');
@@ -647,6 +648,7 @@ function acknowledgeBoon()
     }
     catch(e)
     {
+        console.log(e);
         respond(0);
     }
 }
@@ -654,7 +656,14 @@ function acknowledgeBoon()
 
 function transferBoon()
 {
+    try
+    {
 
+    }
+    catch(e)
+    {
+        return 0;
+    }
 }
 
 function dischargeBoon()
