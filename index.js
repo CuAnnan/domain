@@ -39,6 +39,7 @@ const functions = {
     'validateBoon':validateBoon,
     'rejectBoon':rejectBoon,
     'showBoons':showBoons,
+    'acknowledgeBoon':acknowledgeBoon,
 };
 
 /**
@@ -638,7 +639,16 @@ function rejectBoon()
 
 function acknowledgeBoon()
 {
-
+    try
+    {
+        let boonStmt = db.prepare('UPDATE boons SET acknowledged = 1 WHERE idBoons = ?');
+        boonStmt.run(registers.id.value);
+        respond (1);
+    }
+    catch(e)
+    {
+        respond(0);
+    }
 }
 
 
