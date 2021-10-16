@@ -725,10 +725,10 @@ function fetchBoonLedgerForPlayer(player)
         boons = {boonsOwing:[], boonsOwed:[]};
         for (let boonRow of boonsQry) {
             boonRow.date /= 1000;
-            if (boonRow.bitFrom === bit) {
+            if (boonRow.bitFrom === player) {
                 boons.boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
             }
-            if (boonRow.bitHolder === bit) {
+            if (boonRow.bitHolder === player) {
                 boons.boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
             }
         }
