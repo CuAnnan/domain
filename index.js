@@ -693,7 +693,7 @@ function boonTransferHistory()
         let results = [];
         for(let boonTxRow of boonsTxQry)
         {
-            results += `${boonTxRow.bitFrom}|${boonTxRow.bitTo}|${boonTxRow.txDate / 1000}`;
+            results.push(`${boonTxRow.bitFrom}|${boonTxRow.bitTo}|${boonTxRow.txDate / 1000}`);
         }
         let response = results.join('~');
         respond(response);
