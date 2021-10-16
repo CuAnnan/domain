@@ -15,6 +15,9 @@
 const Database = require("better-sqlite3");
 const db = new Database(__dirname+'/domain.db');
 
+/**
+ * This variable exposes functions to the front end, take a look at the parseCommand function
+ */
 const functions = {
     'claimDomain':claimDomain,
     'addRoomToDomain':addRoomToDomain,
@@ -40,7 +43,8 @@ const functions = {
     'rejectBoon':rejectBoon,
     'showBoons':showBoons,
     'acknowledgeBoon':acknowledgeBoon,
-    'transferBoon':transferBoon
+    'transferBoon':transferBoon,
+    'boonTransferHistory':boonTransferHistory
 };
 
 /**
@@ -680,12 +684,35 @@ function transferBoon()
     }
 }
 
+function boonTransferHistory()
+{
+    try
+    {
+        let boonTxStmt=db.prepare('SELECT * FROM boon_transactions WHERE idBoons = ?');
+        let boonsTxQry = boonTxStmt.all(registers.idBoons.value);
+        let results = [];
+        for(let boonTxRow of boonsTxQry)
+        {
+            results += `${boonTxRow.bitFrom}|${boonTxRow.bitTo}|${boonTxRow.txDate}`;
+        }
+        let response = results.join('~');
+        respond(response);
+    }
+    catch(e)
+    {
+        respond(0);
+    }
+}
+
 function dischargeBoon()
 {
 
 }
 
-
+/**
+ * @param command
+ * @param args DEPRECATED all arguments should now be passed to the system via registers. It prevents the need for tokenisation of strings. Which is always a pain in the arse.
+ */
 function parseCommand(command, args)
 {
     let func;
