@@ -657,6 +657,7 @@ function acknowledgeBoon()
 
 function transferBoon()
 {
+    console.log(registers);
     try
     {
         let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ?');
