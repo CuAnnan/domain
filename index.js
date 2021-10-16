@@ -707,7 +707,14 @@ function boonTransferHistory()
 
 function dischargeBoon()
 {
-
+    try
+    {
+        
+    }
+    catch(e)
+    {
+        respond(0);
+    }
 }
 
 /**
