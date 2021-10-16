@@ -564,7 +564,7 @@ function showBoons()
                 {
                     boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
-                else
+                if(boonRow.bitHolder === bit)
                 {
                     boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
