@@ -569,7 +569,7 @@ function showBoons()
                     boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}`);
                 }
             }
-            let responseText = ["Boons You Are Owed>"+boonsOwed.join('~'),"Boons You Owe>"+boonsOwing.join('~')].join('^');
+            let responseText = ["Boons You Are Owed>"+boonsOwed.join('~')+">0","Boons You Owe>"+boonsOwing.join('~')+">1"].join('^');
             respond(responseText);
         }
         else
