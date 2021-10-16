@@ -595,10 +595,11 @@ function addNewBoonToDB()
             to: registers.to.value,
             validated: (registers.validated && registers.validated.value)?1:0,
             acknowledged: (registers.acknowledged && registers.acknowledged.value)?1:0,
-            magnitude:registers.magnitude.value
+            magnitude:registers.magnitude.value,
+            private:(registers.private && registers.private.value)?1:0
         };
-        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged, date) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        let boonQry = boonStmt.run(boon.magnitude, boon.from, boon.to, boon.to, boon.validated, boon.acknowledged, Date.now());
+        let boonStmt = db.prepare('INSERT INTO boons (magnitude, bitFrom, bitTo, bitHolder, validated, acknowledged, date, private) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        let boonQry = boonStmt.run(boon.magnitude, boon.from, boon.to, boon.to, boon.validated, boon.acknowledged, Date.now(), boon.private);
         respond(boonQry.lastInsertRowid);
     }catch(e)
     {
