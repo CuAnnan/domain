@@ -40,6 +40,7 @@ const functions = {
     'rejectBoon':rejectBoon,
     'showBoons':showBoons,
     'acknowledgeBoon':acknowledgeBoon,
+    'transferBoon':transferBoon
 };
 
 /**
@@ -658,11 +659,24 @@ function transferBoon()
 {
     try
     {
-
+        let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ?');
+        let boonRow = boonOwnershipCheckStmt.get(registers.idBoons.value, registers.playerFrom.value);
+        if(boonRow)
+        {
+            let txStmt = db.prepare('INSERT INTO boon_transactions (bitFrom, bitTo, idBoons, date) VALUES (?, ?, ?, ?)');
+            txStmt.run(registers.playerFrom.value, registers.playerTo.value, register.idBoons.value, Date.now());
+            let boonStmt = db.prepare('UPDATE boons set bitHolder = ? WHERE idBoons = ?');
+            boonStmt.run(registers.playerTo.value, registers.idBoons.value);
+            respond(1);
+        }
+        else
+        {
+            respond(-1);
+        }
     }
     catch(e)
     {
-        return 0;
+        respond (0);
     }
 }
 
