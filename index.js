@@ -44,7 +44,8 @@ const functions = {
     'showBoons':showBoons,
     'acknowledgeBoon':acknowledgeBoon,
     'transferBoon':transferBoon,
-    'boonTransferHistory':boonTransferHistory
+    'boonTransferHistory':boonTransferHistory,
+    'dischargeBoon':dischargeBoon
 };
 
 /**
@@ -624,7 +625,7 @@ function rejectBoon()
 {
     try
     {
-        let boonCountStmt = db.prepare('SELECT COUNT(idBoons) AS cnt FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0');
+        let boonCountStmt = db.prepare('SELECT COUNT(idBoons) AS cnt FROM boons WHERE idBoons=? AND bitFrom=? AND validated=0 AND acknowledged=0 ');
         let boonCountQry=boonCountStmt.get(registers.id.value, registers.player.value);
         if(boonCountQry.cnt < 1)
         {
@@ -664,7 +665,7 @@ function transferBoon()
 {
     try
     {
-        let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ?');
+        let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ? AND discharged = 0');
         let boonRow = boonOwnershipCheckStmt.get(registers.idBoons.value, registers.playerFrom.value);
         if(boonRow)
         {
@@ -709,11 +710,22 @@ function dischargeBoon()
 {
     try
     {
-
+        let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ?');
+        let boonRow = boonOwnershipCheckStmt.get(registers.idBoons.value, registers.playerFrom.value);
+        if(boonRow)
+        {
+            let boonDischargeStmt = db.prepare('UPDATE boons SET discharged = 1 WHERE idBoons = ?');
+            boonDischargeStmt.run(registers.idBoons.value);
+            respond(1);
+        }
+        else
+        {
+            respond(-1);
+        }
     }
     catch(e)
     {
-        respond(0);
+        respond (0);
     }
 }
 
