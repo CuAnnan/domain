@@ -45,7 +45,8 @@ const functions = {
     'acknowledgeBoon':acknowledgeBoon,
     'transferBoon':transferBoon,
     'boonTransferHistory':boonTransferHistory,
-    'dischargeBoon':dischargeBoon
+    'dischargeBoon':dischargeBoon,
+    'harpyLedger':harpyLedger
 };
 
 /**
