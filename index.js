@@ -665,7 +665,7 @@ function transferBoon()
         if(boonRow)
         {
             let txStmt = db.prepare('INSERT INTO boon_transactions (bitFrom, bitTo, idBoons, txDate) VALUES (?, ?, ?, ?)');
-            txStmt.run(registers.playerFrom.value, registers.playerTo.value, register.idBoons.value, Date.now());
+            txStmt.run(registers.playerFrom.value, registers.playerTo.value, registers.idBoons.value, Date.now());
             let boonStmt = db.prepare('UPDATE boons set bitHolder = ? WHERE idBoons = ?');
             boonStmt.run(registers.playerTo.value, registers.idBoons.value);
             respond(1);
