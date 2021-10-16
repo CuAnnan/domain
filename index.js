@@ -711,7 +711,7 @@ function dischargeBoon()
     try
     {
         let boonOwnershipCheckStmt = db.prepare('SELECT idBoons FROM boons WHERE idBoons = ? AND bitHolder = ?');
-        let boonRow = boonOwnershipCheckStmt.get(registers.idBoons.value, registers.playerFrom.value);
+        let boonRow = boonOwnershipCheckStmt.get(registers.idBoons.value, registers.player.value);
         if(boonRow)
         {
             let boonDischargeStmt = db.prepare('UPDATE boons SET discharged = 1 WHERE idBoons = ?');
@@ -725,6 +725,7 @@ function dischargeBoon()
     }
     catch(e)
     {
+        console.log(e);
         respond (0);
     }
 }
