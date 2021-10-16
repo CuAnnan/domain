@@ -566,11 +566,11 @@ function showBoons()
                 boonRow.date /=1000;
                 if(boonRow.bitFrom === bit)
                 {
-                    boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}`);
+                    boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boon.discharged}`);
                 }
                 if(boonRow.bitHolder === bit)
                 {
-                    boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}`);
+                    boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boon.discharged}`);
                 }
             }
             let responseText = ["Boons You Are Owed>"+boonsOwed.join('~')+">0","Boons You Owe>"+boonsOwing.join('~')+">1"].join('^');
@@ -709,7 +709,7 @@ function dischargeBoon()
 {
     try
     {
-        
+
     }
     catch(e)
     {
