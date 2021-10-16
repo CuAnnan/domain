@@ -557,23 +557,9 @@ function getFeedingPool()
 function showBoons()
 {
     try {
-        let bit = registers.player.value;
-        let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
-        let boonsQry = boonsStmt.all(bit, bit);
-        if (boonsQry) {
-            let boonsOwed = [];
-            let boonsOwing = [];
-            for (let boonRow of boonsQry) {
-                boonRow.date /=1000;
-                if(boonRow.bitFrom === bit)
-                {
-                    boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
-                }
-                if(boonRow.bitHolder === bit)
-                {
-                    boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
-                }
-            }
+        let boons = fetchBoonLedgerForPlayer(registers.player.value);
+        if (boons) {
+            let {boonsOwed, boonsOwing} = boons;
             let responseText = ["Boons You Are Owed>"+boonsOwed.join('~')+">0","Boons You Owe>"+boonsOwing.join('~')+">1"].join('^');
             respond(responseText);
         }
@@ -726,6 +712,47 @@ function dischargeBoon()
     catch(e)
     {
         respond (0);
+    }
+}
+
+function fetchBoonLedgerForPlayer(player)
+{
+    let boons;
+    let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
+    let boonsQry = boonsStmt.all(player, player);
+    if (boonsQry)
+    {
+        boons = {boonsOwing:[], boonsOwed:[]};
+        for (let boonRow of boonsQry) {
+            boonRow.date /= 1000;
+            if (boonRow.bitFrom === bit) {
+                boons.boonsOwing.push(`${boonRow.idBoons}|${boonRow.bitTo}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
+            }
+            if (boonRow.bitHolder === bit) {
+                boons.boonsOwed.push(`${boonRow.idBoons}|${boonRow.bitFrom}|${boonRow.magnitude}|${boonRow.acknowledged}|${boonRow.validated}|${boonRow.date}|${boonRow.private}|${boonRow.discharged}`);
+            }
+        }
+    }
+    return boons;
+}
+
+function harpyLedger()
+{
+    try
+    {
+        let boons = fetchBoonLedgerForPlayer(registers.player.value);
+        if (boons) {
+            let {boonsOwed, boonsOwing} = boons;
+            let responseText = ["Boons They Are Owed>"+boonsOwed.join('~')+">0","Boons They Owe>"+boonsOwing.join('~')+">1"].join('^');
+            respond(responseText);
+        }
+        else
+        {
+            respond("No boons found in their ledger.");
+        }
+    }catch(e){
+        console.log(e);
+        respond(0);
     }
 }
 
