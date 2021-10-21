@@ -716,10 +716,10 @@ function dischargeBoon()
     }
 }
 
-function fetchBoonLedgerForPlayer(player)
+function fetchBoonLedgerForPlayer(player, hidePrivate = false)
 {
     let boons;
-    let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ? ORDER BY date');
+    let boonsStmt = db.prepare('SELECT * FROM boons WHERE bitFrom = ? or bitHolder = ?'+(hidePrivate?' AND PRIVATE = 0':'')+' ORDER BY date');
     let boonsQry = boonsStmt.all(player, player);
     if (boonsQry)
     {
@@ -741,7 +741,7 @@ function harpyLedger()
 {
     try
     {
-        let boons = fetchBoonLedgerForPlayer(registers.player.value);
+        let boons = fetchBoonLedgerForPlayer(registers.player.value, true);
         if (boons) {
             let {boonsOwed, boonsOwing} = boons;
             let responseText = ["Boons They Are Owed>"+boonsOwed.join('~')+">0","Boons They Owe>"+boonsOwing.join('~')+">1"].join('^');
